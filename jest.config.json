@@ -1,0 +1,57 @@
+{
+  "bail": true,
+  "clearMocks": true,
+  "collectCoverage": true,
+  "collectCoverageFrom": [
+    "**/*.{ts,tsx}",
+    "!**/*.config.ts"
+  ],
+  "coverageDirectory": "./dist/coverage",
+  "coveragePathIgnorePatterns": [
+    "test",
+    "node_modules",
+    "lib"
+  ],
+  "coverageReporters": [
+    "lcov",
+    "json",
+    "clover",
+    "text"
+  ],
+  "moduleNameMapper": {},
+  "moduleDirectories": [
+    "node_modules",
+    "src"
+  ],
+  "modulePaths": [
+    "node_modules"
+  ],
+  "moduleFileExtensions": [
+    "ts",
+    "tsx",
+    "js",
+    "jsx",
+    "json"
+  ],
+  "preset": "ts-jest",
+  "testRegex": ".spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)sx?$": [
+      "ts-jest",
+      {
+        "tsconfig": "./tsconfig.test.json"
+      }
+    ],
+    "^.+\\.(t|j)s?$": [
+      "ts-jest",
+      {
+        "tsconfig": "./tsconfig.test.json"
+      }
+    ]
+  },
+  "transformIgnorePatterns": [
+    "node_modules/.+.(js|jsx)$",
+    "node_modules/.+.(ts|tsx)$"
+  ],
+  "verbose": true
+}

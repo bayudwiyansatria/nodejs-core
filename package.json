@@ -1,0 +1,90 @@
+{
+  "name": "@bayudwiyansatria/templates-project-nodejs",
+  "version": "1.0.0",
+  "description": "Reusable Node.js library template with TypeScript, Rollup, Jest, and docs scaffolding",
+  "keywords": [
+    "template",
+    "nodejs",
+    "typescript",
+    "library",
+    "rollup",
+    "jest"
+  ],
+  "homepage": "https://bayudwiyansatria.github.io/templates-project-nodejs",
+  "bugs": {
+    "url": "https://github.com/bayudwiyansatria/templates-project-nodejs/issues",
+    "email": "bayudwiyansatria@gmail.com"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Bayu Dwiyan Satria",
+    "email": "bayudwiyansatria@gmail.com",
+    "url": "https://bayudwiyansatria.github.io"
+  },
+  "contributors": [],
+  "maintainers": [],
+  "main": "lib/index.min.js",
+  "type": "module",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/",
+    "!lib/*.map"
+  ],
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bayudwiyansatria/templates-project-nodejs.git"
+  },
+  "scripts": {
+    "dev": "miniflare --live-reload --debug --modules lib/index.min.mjs",
+    "lint": "npm run lint:run",
+    "build": "rollup -c rollup.config.ts",
+    "build:docs": "typedoc",
+    "test": "npm run lint & npm run test:run",
+    "test:run": "jest --config jest.config.json",
+    "lint:run": "eslint -c .eslintrc.json --ext=.ts,tsx",
+    "lint:fix": "eslint -c .eslintrc.json --fix --ext=.ts,tsx"
+  },
+  "config": {},
+  "dependencies": {},
+  "devDependencies": {
+    "@eslint/config-array": "^0.19.1",
+    "@rollup/plugin-eslint": "^8.0.2",
+    "@rollup/plugin-node-resolve": "^14.1.0",
+    "@rollup/plugin-terser": "^1.0.0",
+    "@rollup/plugin-typescript": "^8.5.0",
+    "@types/jest": "^29.0.3",
+    "@types/node": "^18.7.23",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "eslint": "8.23.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-config-typescript": "^3.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^5.2.3",
+    "jest": "^29.0.3",
+    "prettier": "^3.4.2",
+    "rollup": "^2.79.1",
+    "rollup-plugin-dts": "^4.2.2",
+    "rollup-plugin-esbuild": "^6.1.1",
+    "rollup-plugin-serve": "^2.0.1",
+    "ts-jest": "^29.0.1",
+    "typedoc": "^0.23.15",
+    "typescript": "4.7.4"
+  },
+  "peerDependencies": {
+    "rollup": "^1.20.0 || ^2.0.0"
+  },
+  "bundledDependencies": [],
+  "private": false,
+  "module": "lib/index.min.mjs",
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "bundleDependencies": []
+}

@@ -1,0 +1,13 @@
+{
+  "title": "templates-project-nodejs",
+  "description": "Reusable Node.js library template with TypeScript tooling and documentation scaffolding",
+  "author": "Bayu Dwiyan Satria",
+  "language": "en",
+  "root": "./docs",
+  "plugins": [],
+  "links": {
+    "sidebar": {
+      "Repository": "https://github.com/bayudwiyansatria/templates-project-nodejs"
+    }
+  }
+}

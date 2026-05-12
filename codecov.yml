@@ -1,0 +1,38 @@
+codecov:
+  notify:
+    require_ci_to_pass: yes
+coverage:
+  precision: 2
+  round: nearest
+  range: 10...90
+  status:
+    project:
+      default:
+        target: 70%
+        threshold: 0%
+        branches:
+        - master
+        if_ci_failed: error
+    patch:
+      default:
+        target: 70%
+        threshold: 0%
+parsers:
+  gcov:
+    branch_detection:
+      conditional: true
+      loop: true
+      macro: false
+      method: false
+  javascript:
+    enable_partials: false
+comment:
+  layout: header, diff
+  require_changes: false
+  behavior: default
+ignore:
+- "data/**"
+- "docs/**"
+- "coverage/**"
+- "lib/**"
+- "build/**"

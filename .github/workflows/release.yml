@@ -1,0 +1,117 @@
+name: Release Dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      MAJOR_VERSION:
+        type: number
+        description: Major Version
+        required: true
+        default: 0
+      MINOR_VERSION:
+        type: number
+        description: Minor Version
+        required: true
+        default: 0
+      INCREMENTAL_VERSION:
+        type: number
+        description: Patch Version
+        required: true
+        default: 1
+jobs:
+  #---------------------------------------------------------------------------------------------------------------------
+  # Build
+  #---------------------------------------------------------------------------------------------------------------------
+  build:
+    name: Build
+    uses: bayudwiyansatria/.github/.github/workflows/build-node-npm.yml@master
+    with:
+      NODE_VERSION: 21
+    secrets:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Build: Documentation
+  #---------------------------------------------------------------------------------------------------------------------
+  docs:
+    name: Docs
+    needs:
+    - build
+    uses: bayudwiyansatria/.github/.github/workflows/build-node-docs.yml@master
+    with:
+      NODE_VERSION: 21
+    secrets:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Test
+  #---------------------------------------------------------------------------------------------------------------------
+  test:
+    name: Test
+    needs: 
+    - build
+    uses: bayudwiyansatria/.github/.github/workflows/test-node-npm.yml@master
+    with:
+      NODE_VERSION: 21
+    secrets:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Publish
+  #---------------------------------------------------------------------------------------------------------------------
+  publish:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    name: Publish
+    needs: 
+    - build
+    - docs
+    - test
+    uses: bayudwiyansatria/.github/.github/workflows/deploy-node-npm.yml@master
+    with:
+      MAJOR_VERSION: ${{ inputs.MAJOR_VERSION }}
+      MINOR_VERSION: ${{ inputs.MINOR_VERSION }}
+      INCREMENTAL_VERSION: ${{ inputs.INCREMENTAL_VERSION }}
+      NODE_VERSION: 21
+      ARTIFACT_NAME: lib
+      ARTIFACT_PATH: lib
+      NPM_REGISTRY: https://npm.pkg.github.com
+    secrets:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Publish
+  #---------------------------------------------------------------------------------------------------------------------
+  release:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    name: Release
+    needs: 
+    - publish
+    uses: bayudwiyansatria/.github/.github/workflows/release-github.yml@master
+    with:
+      MAJOR_VERSION: ${{ inputs.MAJOR_VERSION }}
+      MINOR_VERSION: ${{ inputs.MINOR_VERSION }}
+      INCREMENTAL_VERSION: ${{ inputs.INCREMENTAL_VERSION }}
+      ARTIFACT_PACKAGES_TYPE: package.json
+      ARTIFACT_ASSET: lib
+      ARTIFACT_NAME: lib
+      ARTIFACT_PATH: lib
+      COVERAGE_ENABLED: true
+      COVERAGE_NAME: coverage
+      COVERAGE_PATH: dist/coverage
+      DOCS_ENABLED: true
+      DOCS_NAME: docs
+      DOCS_PATH: dist/docs
+    secrets:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # GitHub Pages
+  #---------------------------------------------------------------------------------------------------------------------
+  pages:
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.repository.visibility == 'public' }}
+    name: GitHub Pages
+    needs:
+    - release
+    uses: bayudwiyansatria/.github/.github/workflows/release-github-pages.yml@master
+    with:
+      ARTIFACT_NAME: docs
+      ARTIFACT_PATH: dist
+      ARTIFACT_ROOT: dist
+    secrets:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

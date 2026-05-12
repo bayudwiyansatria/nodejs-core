@@ -1,0 +1,18 @@
+services:
+  app:
+    image: bayudwiyansatria/templates-project-nodejs:latest
+    build:
+      context: .
+      # Bug: https://github.com/orgs/community/discussions/26634
+      args: []
+      #dockerfile: Dockerfile
+      dockerfile: Dockerfile
+    container_name: templates-project-nodejs
+    working_dir: /app
+    networks:
+      - app-network
+    env_file: []
+volumes: {}
+networks:
+  app-network:
+    driver: bridge

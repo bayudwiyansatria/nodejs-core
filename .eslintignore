@@ -1,0 +1,10 @@
+# User-specific directory
+node_modules/
+dist/
+lib/
+coverage/
+
+# User-specific files
+.prettierignore
+.eslintignore
+rollup.config.ts

@@ -1,0 +1,19 @@
+services:
+  app-book:
+    image: bayudwiyansatria/templates-project-nodejs:book-latest
+    build:
+      context: ../
+      # Bug: https://github.com/orgs/community/discussions/26634
+      args: []
+      #dockerfile: Dockerfile
+      dockerfile: docker/book.Dockerfile
+    container_name: app-book
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+    env_file: []
+volumes: {}
+networks:
+  app-network:
+    driver: bridge

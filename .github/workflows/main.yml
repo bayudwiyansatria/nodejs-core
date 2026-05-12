@@ -1,0 +1,42 @@
+name: Main
+on:
+  push:
+    branches:
+    - master
+jobs:
+  #---------------------------------------------------------------------------------------------------------------------
+  # Build
+  #---------------------------------------------------------------------------------------------------------------------
+  build:
+    name: Build
+    uses: bayudwiyansatria/.github/.github/workflows/build-node-npm.yml@master
+    with:
+      NODE_VERSION: 21
+    secrets:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Build: Documentation
+  #---------------------------------------------------------------------------------------------------------------------
+  docs:
+    name: Docs
+    needs:
+    - build
+    uses: bayudwiyansatria/.github/.github/workflows/build-node-docs.yml@master
+    with:
+      NODE_VERSION: 21
+    secrets:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Test
+  #---------------------------------------------------------------------------------------------------------------------
+  test:
+    name: Test
+    needs: 
+    - build
+    uses: bayudwiyansatria/.github/.github/workflows/test-node-npm.yml@master
+    with:
+      NODE_VERSION: 21
+    secrets:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  

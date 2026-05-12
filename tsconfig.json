@@ -1,0 +1,42 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2020",
+    "lib": [
+      "ES2020",
+      "ES2015",
+      "DOM"
+    ],
+    /* Modules */
+    "rootDir": "./",
+    "baseUrl": "src",
+    "module": "ES2020",
+    "types": [
+      "@types/jest",
+      "@types/node"
+    ],
+    "resolveJsonModule": true,
+    /* Emit */
+    "declaration": false,
+    "outDir": "lib",
+    "removeComments": true,
+    "noEmit": false,
+    /* Interop Constraints */
+    "esModuleInterop": true,
+    /* Type Checking */
+    "strict": false,
+    "strictNullChecks": false,
+    /* Completeness */
+    "skipDefaultLibCheck": true
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.json",
+    "test/**/*.ts",
+    "test/**/*.json"
+  ]
+}
