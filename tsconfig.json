@@ -3,14 +3,30 @@
   "compilerOptions": {
     /* Language and Environment */
     "target": "ES2020",
+    /*
+     * No `DOM`, and no `WebWorker`. The kernel is meant to compile for any
+     * runtime — Node, a Worker, a browser — so it may use only what the language
+     * itself guarantees. A type error pointing at a missing lib here is the
+     * signal that something runtime-specific has crept in; the fix is to move it
+     * into an adapter package, not to widen this list.
+     */
     "lib": [
       "ES2020",
-      "ES2015",
-      "DOM"
+      "ES2015"
     ],
     /* Modules */
     "rootDir": "./",
-    "baseUrl": "src",
+    /*
+     * `paths` without `baseUrl` (TypeScript 4.4+). `baseUrl` would make
+     * `import … from 'utils'` resolve to `src/utils`, but `utils`, `types`, and
+     * `constants` are all real packages on npm — what such an import means would
+     * depend on what happens to be installed. The `@/` prefix cannot collide.
+     */
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
     "module": "ES2020",
     "types": [
       "@types/jest",

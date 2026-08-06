@@ -1,14 +1,16 @@
+name: templates-project-nodejs
 services:
-  app:
-    image: bayudwiyansatria/templates-project-nodejs:latest
+  app-docs:
+    image: bayudwiyansatria/templates-project-nodejs:docs
     build:
-      context: .
+      context: ../
       # Bug: https://github.com/orgs/community/discussions/26634
       args: []
       #dockerfile: Dockerfile
-      dockerfile: Dockerfile
-    container_name: templates-project-nodejs
-    working_dir: /app
+      dockerfile: docker/docs.Dockerfile
+    container_name: templates-project-nodejs-docs
+    ports:
+      - "80:80"
     networks:
       - app-network
     env_file: []

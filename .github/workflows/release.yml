@@ -26,6 +26,8 @@ jobs:
     uses: bayudwiyansatria/.github/.github/workflows/build-node-npm.yml@master
     with:
       NODE_VERSION: 21
+      ARTIFACT_NAME: lib
+      ARTIFACT_PATH: lib
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
   #---------------------------------------------------------------------------------------------------------------------
@@ -34,7 +36,7 @@ jobs:
   docs:
     name: Docs
     needs:
-    - build
+      - build
     uses: bayudwiyansatria/.github/.github/workflows/build-node-docs.yml@master
     with:
       NODE_VERSION: 21
@@ -45,11 +47,13 @@ jobs:
   #---------------------------------------------------------------------------------------------------------------------
   test:
     name: Test
-    needs: 
-    - build
+    needs:
+      - build
     uses: bayudwiyansatria/.github/.github/workflows/test-node-npm.yml@master
     with:
       NODE_VERSION: 21
+      BUILD_ARTIFACT_NAME: lib
+      BUILD_ARTIFACT_PATH: lib
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -59,10 +63,10 @@ jobs:
   publish:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     name: Publish
-    needs: 
-    - build
-    - docs
-    - test
+    needs:
+      - build
+      - docs
+      - test
     uses: bayudwiyansatria/.github/.github/workflows/deploy-node-npm.yml@master
     with:
       MAJOR_VERSION: ${{ inputs.MAJOR_VERSION }}
@@ -81,8 +85,8 @@ jobs:
   release:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     name: Release
-    needs: 
-    - publish
+    needs:
+      - publish
     uses: bayudwiyansatria/.github/.github/workflows/release-github.yml@master
     with:
       MAJOR_VERSION: ${{ inputs.MAJOR_VERSION }}
@@ -107,7 +111,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.repository.visibility == 'public' }}
     name: GitHub Pages
     needs:
-    - release
+      - release
     uses: bayudwiyansatria/.github/.github/workflows/release-github-pages.yml@master
     with:
       ARTIFACT_NAME: docs

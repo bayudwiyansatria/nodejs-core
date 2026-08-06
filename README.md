@@ -1,86 +1,99 @@
-# Templates Project Node.js
+# Core
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
-[![License](https://img.shields.io/github/license/bayudwiyansatria/templates-project-nodejs)](LICENSE)
-[![Version](https://img.shields.io/github/package-json/v/bayudwiyansatria/templates-project-nodejs)](package.json)
+[![License](https://img.shields.io/github/license/bayudwiyansatria/nodejs-core)](LICENSE)
+[![Version](https://img.shields.io/github/package-json/v/bayudwiyansatria/nodejs-core)](package.json)
 
-A reusable Node.js library template focused on TypeScript, Rollup packaging, Jest testing, and complete repository docs.
+The kernel every other package depends on: capability interfaces, configuration resolution, structured logging, and the
+service response contract.
 
-## Overview
+## What this is
 
-This repository is a starter template for publishing Node.js libraries. It is intended to be copied and adapted into a
-new project by replacing package metadata, adding source files in `src/`, and updating documentation for your domain.
+A layer that names no vendor and no HTTP framework. It describes what an application needs from its platform — a cache,
+relational storage, a queue — and leaves an adapter package to say what provides it.
 
-## Included in This Template
-
-- TypeScript project setup (`tsconfig*.json`)
-- Rollup build pipeline for distributable library outputs
-- Jest test configuration
-- ESLint + Prettier integration
-- TypeDoc documentation generation
-- Community standards files (Contributing, Code of Conduct, Security, Support)
-- Changelog and release notes structure
-
-## Project Structure
-
-```text
-src/                          Source files for your library (currently empty template)
-docs/                         Documentation and release history
-  changes-log/                Per-date change logs
-  release-notes/              Per-version release notes
-CHANGELOG.md                  Top-level changelog
-CONTRIBUTING.md               Contribution workflow
-SECURITY.md                   Security policy
-SUPPORT.md                    Support channels
+```
+@bayudwiyansatria/core          ← you are here    knows no vendor, no framework
+        ▲
+@bayudwiyansatria/cloudflare                      the Cloudflare adapters
+        ▲
+your Worker                                       the application
 ```
 
-## Quick Start
+An ESLint rule enforces that boundary. If something here appears to need `@cloudflare/workers-types` or `hono`, that is
+the signal it belongs in an adapter package instead.
+
+## Install
+
+```bash
+npm install @bayudwiyansatria/core
+```
+
+## Quick start
+
+```ts
+import { configure, Logger, resolve, systemDefaults } from '@bayudwiyansatria/core'
+import { cloudflareDefaults } from '@bayudwiyansatria/cloudflare'
+
+// Once, at startup, before anything reads a setting.
+configure({ ...systemDefaults, ...cloudflareDefaults }, overrides)
+
+const log = Logger.fromEnv(env, { service: 'ArticleService' })
+log.info('article created', { id: 42 })
+```
+
+## What it exports
+
+| Category      | Exports                                                              |
+| ------------- | -------------------------------------------------------------------- |
+| Contracts     | `Service`, `APIResponse`                                             |
+| Capabilities  | `Capability` and the twelve interfaces over it, plus the `Noop*` four |
+| Configuration | `configure`, `resolve`, `systemDefaults`, the settings shapes         |
+| Observability | `Logger`, `LogContext`                                               |
+| Security      | `timingSafeEqual`                                                    |
+| Errors        | `MissingCapabilityError`, `ConfigurationError`                       |
+| Utilities     | `Signature`, `Text`, `Time`                                          |
+
+## The two rules worth knowing
+
+**Configure before you resolve.** `configure()` seeds a module-level registry that `resolve()` reads. Anything that
+looks a setting up before it has run gets a `ConfigurationError` naming both likely causes.
+
+**Adapters must treat this package as external.** The registry is module state and `MissingCapabilityError` is a class
+identity, so a bundler that inlines a second copy breaks both silently — `configure()` seeds one registry while the
+adapter reads the other, and `instanceof` stops matching. `@bayudwiyansatria/cloudflare` guards against this on its own
+built bundles with `npm run verify:external`.
+
+## Project structure
+
+```text
+src/
+  index.ts              public API barrel — the entire published surface
+  capabilities/         what an application needs from a platform, without naming one
+    noop/               implementations that satisfy a capability without providing it
+  config/               configure(), resolve(), and the kernel's own settings
+  observability/        Logger, LogContext
+  security/             timingSafeEqual
+  errors/               MissingCapabilityError, ConfigurationError
+  utils/                Signature, Text, Time
+  Service.ts            abstract base: ok() / fail() builders
+  APIResponse.ts        the envelope that contract is expressed in
+test/                   Jest specs mirroring src/
+docs/                   developer book
+```
+
+## Local development
 
 ```bash
 npm install
-npm run build
-npm run test:run
+npm test           # lint + jest
+npm run build      # four artifacts under lib/
+npm run build:docs
 ```
 
-## Available Scripts
-
-- `npm run build` Build library artifacts via Rollup
-- `npm run test:run` Run tests using Jest
-- `npm run test` Run lint and tests
-- `npm run lint:run` Run linter
-- `npm run lint:fix` Run linter with auto-fix
-- `npm run build:docs` Generate API documentation with TypeDoc
-
-## How to Use This Template
-
-1. Update `package.json` metadata (`name`, `description`, `keywords`, repository URLs).
-2. Implement your library inside `src/`.
-3. Add or update tests.
-4. Replace this README with project-specific usage examples.
-5. Keep changelog and release notes updated for each release.
+Documentation is a build gate rather than an afterthought: `typedoc.json` sets `treatWarningsAsErrors` alongside
+`validation.notDocumented`, so an undocumented export or a broken cross-reference fails `npm run build:docs`.
 
 ## Documentation
 
-- [Docs Home](docs/README.md)
-- [Summary](docs/SUMMARY.md)
-- [Latest Release Notes](docs/release-notes/1.0.0.md)
-- [Initial Changes Log](docs/changes-log/2026-apr-19.md)
-
-## Contributing and Governance
-
-- [Contributing Guide](CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Security Policy](SECURITY.md)
-- [Support Guide](SUPPORT.md)
-
-## Authors
-
-- [Bayu Dwiyan Satria](https://github.com/bayudwiyansatria) - Creator and Maintainer
-
-## Acknowledgments
-
-Thanks to the open-source community and all contributors for support and inspiration.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+See [`docs/`](docs/README.md), or the generated API reference at <https://bayudwiyansatria.github.io/nodejs-core>.

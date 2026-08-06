@@ -1,0 +1,233 @@
+/* HonKit website theme inspired by docker/nginx/index.html */
+
+:root {
+  --bg-900: #020617;
+  --bg-800: #0f172a;
+  --bg-700: #1e293b;
+  --text-100: #f8fafc;
+  --text-300: #cbd5e1;
+  --text-400: #94a3b8;
+  --border: rgba(148, 163, 184, 0.35);
+  --danger-500: #ef4444;
+  --focus: rgba(239, 68, 68, 0.35);
+  --panel-bg: rgba(30, 41, 59, 0.5);
+  --panel-shadow: 0 25px 60px rgba(2, 6, 23, 0.45);
+}
+
+.book {
+  color: var(--text-100);
+  background:
+    radial-gradient(circle at 10% 10%, rgba(239, 68, 68, 0.18), transparent 45%),
+    radial-gradient(circle at 80% 90%, rgba(244, 63, 94, 0.18), transparent 42%),
+    linear-gradient(135deg, var(--bg-900) 0%, var(--bg-800) 55%, var(--bg-900) 100%);
+}
+
+.book .book-summary,
+.book .book-body,
+.book .book-header {
+  color: var(--text-300);
+  background: transparent;
+}
+
+.book.with-summary .book-summary {
+  width: 300px;
+  border-right: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.book.with-summary .book-body {
+  left: 300px;
+}
+
+.book .book-summary .book-search {
+  border-bottom: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.book .book-summary .book-search input {
+  color: var(--text-100);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: rgba(30, 41, 59, 0.75);
+}
+
+.book .book-summary .book-search input:focus {
+  border-color: rgba(239, 68, 68, 0.65);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.book .book-summary ul.summary li.divider {
+  height: 1px;
+  background: var(--border);
+}
+
+.book .book-summary ul.summary li a,
+.book .book-summary ul.summary li span {
+  color: var(--text-300);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.book .book-summary ul.summary li a:hover,
+.book .book-summary ul.summary li.active > a {
+  color: var(--text-100);
+  background: rgba(30, 41, 59, 0.75);
+  border-left: 3px solid var(--danger-500);
+}
+
+.book .book-header {
+  height: 56px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.book .book-header h1,
+.book .book-header h2,
+.book .book-header h3,
+.book .book-header h4,
+.book .book-header h5,
+.book .book-header h6,
+.book .book-header .btn {
+  color: var(--text-300);
+}
+
+.book .book-header .btn:hover {
+  color: var(--text-100);
+}
+
+.book .book-body .page-wrapper {
+  background: transparent;
+}
+
+.book .book-body .page-wrapper .page-inner {
+  max-width: 980px;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal {
+  margin: 26px 18px;
+  padding: 28px;
+  color: var(--text-300);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--panel-shadow);
+}
+
+.book .book-body .page-wrapper .page-inner section.normal h1,
+.book .book-body .page-wrapper .page-inner section.normal h2,
+.book .book-body .page-wrapper .page-inner section.normal h3,
+.book .book-body .page-wrapper .page-inner section.normal h4,
+.book .book-body .page-wrapper .page-inner section.normal h5,
+.book .book-body .page-wrapper .page-inner section.normal h6 {
+  color: var(--text-100);
+  letter-spacing: -0.01em;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal a {
+  color: #93c5fd;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal a:hover {
+  color: #bfdbfe;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal code {
+  color: var(--text-100);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.book .book-body .page-wrapper .page-inner section.normal pre,
+.book .book-body .page-wrapper .page-inner section.normal pre > code {
+  color: var(--text-300);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.78);
+}
+
+.book .book-body .page-wrapper .page-inner section.normal blockquote {
+  color: var(--text-300);
+  border-left: 4px solid var(--danger-500);
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.book .book-body .page-wrapper .page-inner section.normal hr {
+  border-top: 1px solid var(--border);
+}
+
+.book .book-body .page-wrapper .page-inner section.normal table th,
+.book .book-body .page-wrapper .page-inner section.normal table td {
+  border-color: var(--border);
+}
+
+.book .book-body .page-wrapper .page-inner section.normal table tr:nth-child(2n) {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.book .navigation {
+  color: var(--text-300);
+}
+
+.book .navigation:hover {
+  color: var(--text-100);
+}
+
+/* Table styling for dark theme readability */
+.book .book-body .page-wrapper .page-inner section.normal table {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal table th {
+  background: rgba(30, 41, 59, 0.95);
+  color: var(--text-100);
+  font-weight: 700;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal table td {
+  color: var(--text-300);
+}
+
+/* Search box styling */
+.book .book-header .book-search input {
+  background: rgba(30, 41, 59, 0.9);
+  color: var(--text-100);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.book .book-header .book-search input:focus {
+  border-color: rgba(239, 68, 68, 0.7);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
+}
+
+.book .book-header .book-search input::placeholder {
+  color: var(--text-400);
+}
+
+@media (max-width: 1240px) {
+  .book .book-body .page-wrapper .page-inner section.normal {
+    margin-left: 14px;
+    margin-right: 14px;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .book .book-body .page-wrapper .page-inner section.normal {
+    margin: 12px 10px;
+    padding: 18px;
+    border-radius: 14px;
+  }
+}

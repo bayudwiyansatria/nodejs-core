@@ -1,18 +1,26 @@
-# Templates Project Node.js Docs
+# Documentation
 
-This documentation folder is the baseline docs structure for a Node.js library template.
+This is the developer book for `@bayudwiyansatria/core`. The API reference is generated separately by TypeDoc from the
+public surface in [`src/index.ts`](../src/index.ts); everything a generator cannot infer lives here.
 
-## Contents
+The Cloudflare adapters that implement these capabilities are documented separately, in
+[`nodejs-cloudflare`](https://github.com/bayudwiyansatria/nodejs-cloudflare).
 
-- [Release Notes](release-notes/1.0.0.md)
-- [Changes Log](changes-log/2026-apr-19.md)
-- [Summary](SUMMARY.md)
+## [`reference/`](./reference/)
 
-## Usage
+| Doc                                              | Covers                                                               |
+| ------------------------------------------------ | -------------------------------------------------------------------- |
+| [configuration.md](./reference/configuration.md) | `configure`, `resolve`, merge semantics, and the ordering constraint |
 
-When creating a new library from this template:
+## [`release-notes/`](./release-notes/)
 
-1. Replace docs content with your library-specific guides and API docs.
-2. Keep release notes per version under `docs/release-notes/`.
-3. Keep dated change entries under `docs/changes-log/`.
-4. Keep [SUMMARY.md](SUMMARY.md) in sync with available docs pages.
+Per-version release notes — what shipped in each release.
+
+## [`changes-log/`](./changes-log/)
+
+Dated engineering change log (`YYYY-MM-DD.md`) — a more granular, chronological record of what changed and why.
+
+---
+
+Historical docs (`release-notes/`, `changes-log/`) are point-in-time records and are not updated retroactively when the
+codebase moves on. `reference/` is a living doc — if you change the behavior it describes, update it in the same change.

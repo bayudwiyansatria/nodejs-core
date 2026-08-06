@@ -1,13 +1,16 @@
 {
-  "title": "templates-project-nodejs",
-  "description": "Reusable Node.js library template with TypeScript tooling and documentation scaffolding",
+  "title": "@bayudwiyansatria/core",
+  "description": "The vendor-neutral kernel: capabilities, configuration, logging, and the service contract",
   "author": "Bayu Dwiyan Satria",
   "language": "en",
-  "root": "./docs",
+  "root": ".",
+  "styles": {
+    "website": "styles/website.css"
+  },
   "plugins": [],
   "links": {
     "sidebar": {
-      "Repository": "https://github.com/bayudwiyansatria/templates-project-nodejs"
+      "Repository": "https://github.com/bayudwiyansatria/nodejs-core"
     }
   }
 }

@@ -3,25 +3,24 @@
   "clearMocks": true,
   "collectCoverage": true,
   "collectCoverageFrom": [
-    "**/*.{ts,tsx}",
-    "!**/*.config.ts"
+    "src/**/*.{ts,tsx}"
   ],
   "coverageDirectory": "./dist/coverage",
   "coveragePathIgnorePatterns": [
-    "test",
-    "node_modules",
-    "lib"
+    "node_modules"
   ],
   "coverageReporters": [
-    "lcov",
+    "lcovonly",
+    "html",
     "json",
     "clover",
     "text"
   ],
-  "moduleNameMapper": {},
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
   "moduleDirectories": [
-    "node_modules",
-    "src"
+    "node_modules"
   ],
   "modulePaths": [
     "node_modules"

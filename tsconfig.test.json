@@ -1,9 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./"
-  },
-  "types": [
-    "@types/node"
-  ]
+    "rootDir": "./",
+    "types": [
+      "@types/jest",
+      "@types/node"
+    ]
+  }
 }

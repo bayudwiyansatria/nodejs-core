@@ -6,7 +6,7 @@ coverage/
 
 # User-specific files
 .prettierignore
-.eslintignore
 tsconfig.base.json
 **/*.yml
 rollup.config.ts
+eslint.config.ts

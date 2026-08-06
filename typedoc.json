@@ -1,7 +1,76 @@
 {
   "$schema": "https://typedoc.org/schema.json",
+  "name": "Core",
   "entryPoints": [
     "./src/index.ts"
   ],
-  "out": "./dist/docs"
+  "out": "./dist/docs",
+  "includeVersion": true,
+  "skipErrorChecking": false,
+  "excludePrivate": false,
+  "excludeInternal": true,
+  "validation": {
+    "invalidLink": true,
+    "notExported": true,
+    "rewrittenLink": true,
+    "notDocumented": true
+  },
+  "treatWarningsAsErrors": true,
+  "navigationLinks": {
+    "GitHub": "https://github.com/bayudwiyansatria/nodejs-core"
+  },
+  "categorizeByGroup": true,
+  "sort": [
+    "kind",
+    "alphabetical"
+  ],
+  "blockTags": [
+    "@defaultValue",
+    "@deprecated",
+    "@example",
+    "@jsx",
+    "@param",
+    "@privateRemarks",
+    "@remarks",
+    "@returns",
+    "@see",
+    "@throws",
+    "@typeParam",
+    "@author",
+    "@callback",
+    "@class",
+    "@constant",
+    "@function",
+    "@interface",
+    "@category",
+    "@categoryDescription",
+    "@default",
+    "@document",
+    "@extends",
+    "@augments",
+    "@yields",
+    "@group",
+    "@groupDescription",
+    "@import",
+    "@inheritDoc",
+    "@license",
+    "@module",
+    "@mergeModuleWith",
+    "@prop",
+    "@property",
+    "@return",
+    "@satisfies",
+    "@since",
+    "@sortStrategy",
+    "@template",
+    "@this",
+    "@type",
+    "@typedef",
+    "@summary",
+    "@version",
+    "@preventInline",
+    "@inlineType",
+    "@preventExpand",
+    "@expandType"
+  ]
 }

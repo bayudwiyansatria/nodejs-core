@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A reusable Node.js library template with TypeScript, Rollup multi-format bundling, Jest, ESLint, and a complete documentation system."
+    />
+    <meta
+      name="keywords"
+      content="Node.js, TypeScript, Library Template, Rollup, Jest, ESLint, TypeDoc, HonKit, CI/CD"
+    />
+    <meta name="author" content="Bayu Dwiyan Satria" />
+    <meta name="application-name" content="Templates Project Node.js" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="google" content="max-image-preview:large" />
+    <meta name="theme-color" content="#ef4444" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Templates Project Node.js" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Templates Project Node.js" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Templates Project Node.js" />
+    <meta
+      property="og:description"
+      content="A reusable Node.js library template with TypeScript, Rollup multi-format bundling, Jest, ESLint, and a complete documentation system."
+    />
+    <meta property="og:url" content="https://bayudwiyansatria.github.io/templates-project-nodejs/" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@bayudsatria" />
+    <meta name="twitter:creator" content="@bayudsatria" />
+    <meta name="twitter:title" content="Templates Project Node.js" />
+    <meta
+      name="twitter:description"
+      content="A reusable Node.js library template with TypeScript, Rollup multi-format bundling, Jest, ESLint, and a complete documentation system."
+    />
+    <meta
+      name="twitter:image"
+      content="https://opengraph.githubassets.com/1/bayudwiyansatria/templates-project-nodejs"
+    />
+    <meta name="twitter:image:alt" content="Templates Project Node.js" />
+
+    <!-- Title -->
+    <title>Templates Project Node.js</title>
+
+    <!-- Schema.org JSON-LD -->
+    <!-- WebSite -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://project.bayudwiyansatria.com/templates-project-nodejs/#website",
+        "url": "https://project.bayudwiyansatria.com/templates-project-nodejs/",
+        "name": "Templates Project Node.js",
+        "description": "A reusable Node.js library template with TypeScript, Rollup multi-format bundling, Jest, ESLint, and a complete documentation system.",
+        "inLanguage": "en-US",
+        "creator": {
+          "@id": "https://www.bayudwiyansatria.com/#person"
+        },
+        "isPartOf": {
+          "@id": "https://www.bayudwiyansatria.com/#website"
+        }
+      }
+    </script>
+
+    <!-- SoftwareSourceCode -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        "@id": "https://project.bayudwiyansatria.com/templates-project-nodejs/#sourcecode",
+        "name": "Templates Project Node.js",
+        "description": "A reusable Node.js library template with TypeScript, Rollup multi-format bundling, Jest, ESLint, and a complete documentation system.",
+        "url": "https://project.bayudwiyansatria.com/templates-project-nodejs/",
+        "codeRepository": "https://github.com/bayudwiyansatria/templates-project-nodejs",
+        "programmingLanguage": "TypeScript",
+        "runtimePlatform": "Node.js",
+        "license": "https://opensource.org/licenses/MIT",
+        "keywords": "node.js, typescript, library template, rollup, jest, scaffolding",
+        "author": {
+          "@id": "https://www.bayudwiyansatria.com/#person"
+        }
+      }
+    </script>
+
+    <!-- SoftwareApplication (SEO BOOST - recommended) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "@id": "https://project.bayudwiyansatria.com/templates-project-nodejs/#app",
+        "name": "Templates Project Node.js",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Node.js",
+        "description": "Starter template for publishing Node.js libraries using TypeScript and Rollup.",
+        "url": "https://project.bayudwiyansatria.com/templates-project-nodejs/",
+        "codeRepository": "https://github.com/bayudwiyansatria/templates-project-nodejs",
+        "programmingLanguage": "TypeScript",
+        "author": {
+          "@id": "https://www.bayudwiyansatria.com/#person"
+        }
+      }
+    </script>
+
+    <!-- Breadcrumb -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://project.bayudwiyansatria.com/templates-project-nodejs/"
+          }
+        ]
+      }
+    </script>
+    <style>
+      :root {
+        --bg-900: #020617;
+        --bg-800: #0f172a;
+        --bg-700: #1e293b;
+
+        --text-100: #f8fafc;
+        --text-300: #cbd5e1;
+        --text-400: #94a3b8;
+
+        --border: rgba(148, 163, 184, 0.35);
+
+        --danger-500: #ef4444;
+        --danger-600: #dc2626;
+
+        --focus: rgba(239, 68, 68, 0.35);
+
+        --card-bg: rgba(30, 41, 59, 0.5);
+        --card-shadow: 0 25px 60px rgba(2, 6, 23, 0.45);
+
+        --radius-xl: 20px;
+        --radius-md: 12px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          'Helvetica Neue',
+          Arial,
+          sans-serif;
+
+        color: var(--text-100);
+
+        background:
+          radial-gradient(circle at 10% 10%, rgba(239, 68, 68, 0.18), transparent 45%),
+          radial-gradient(circle at 80% 90%, rgba(244, 63, 94, 0.18), transparent 42%),
+          linear-gradient(135deg, var(--bg-900) 0%, var(--bg-800) 55%, var(--bg-900) 100%);
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(18px, 3vw, 32px) clamp(12px, 2.8vw, 20px);
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      .constellation {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+
+      .portal-shell {
+        width: 100%;
+        max-width: 980px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 1;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .logo {
+        width: 72px;
+        height: 72px;
+        margin: 0 auto 18px;
+        border-radius: 18px;
+
+        background: linear-gradient(135deg, var(--danger-500), #f43f5e);
+
+        display: grid;
+        place-items: center;
+
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+
+        box-shadow: 0 14px 34px rgba(239, 68, 68, 0.45);
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: clamp(30px, 5vw, 42px);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.04em;
+      }
+
+      .header p {
+        margin: 14px auto 0;
+        max-width: 760px;
+        color: var(--text-300);
+        font-size: clamp(15px, 2.2vw, 17px);
+        line-height: 1.7;
+      }
+
+      .intro {
+        font-size: 15px !important;
+        color: var(--text-400) !important;
+        max-width: 720px;
+      }
+
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: clamp(12px, 2vw, 18px);
+        width: 100%;
+      }
+
+      .nav-card {
+        position: relative;
+
+        display: block;
+        text-decoration: none;
+        color: var(--text-100);
+
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--border);
+
+        background: var(--card-bg);
+
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+
+        box-shadow: var(--card-shadow);
+
+        padding: clamp(18px, 2.5vw, 28px);
+
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease,
+          background 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .nav-card:hover {
+        transform: translateY(-6px);
+
+        border-color: rgba(239, 68, 68, 0.7);
+
+        background: rgba(30, 41, 59, 0.72);
+
+        box-shadow:
+          0 30px 70px rgba(2, 6, 23, 0.55),
+          0 0 0 1px rgba(239, 68, 68, 0.15);
+      }
+
+      .nav-card h2 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .nav-card p {
+        margin: 12px 0 0;
+
+        color: var(--text-300);
+
+        font-size: 14px;
+        line-height: 1.7;
+
+        overflow-wrap: anywhere;
+      }
+
+      .page-footer {
+        text-align: center;
+        margin-top: 22px;
+
+        color: var(--text-400);
+
+        font-size: 13px;
+        letter-spacing: 0.02em;
+      }
+
+      .page-footer .footer-main {
+        margin-bottom: 10px;
+      }
+
+      .page-footer .footer-meta {
+        margin-top: 4px;
+      }
+
+      .page-footer a {
+        color: var(--text-300);
+        text-decoration: none;
+      }
+
+      .page-footer a:hover {
+        color: var(--text-100);
+        text-decoration: underline;
+      }
+
+      @media (max-width: 1024px) {
+        .portal-shell {
+          max-width: 860px;
+        }
+
+        .cards-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 860px) {
+        .cards-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .header h1 {
+          font-size: 36px;
+        }
+
+        .header {
+          margin-bottom: 20px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .portal-shell {
+          max-width: 560px;
+        }
+
+        .header p {
+          line-height: 1.6;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 16px 12px;
+        }
+
+        .logo {
+          width: 56px;
+          height: 56px;
+          margin-bottom: 12px;
+          border-radius: 14px;
+          font-size: 24px;
+        }
+
+        .header h1 {
+          font-size: 28px;
+          line-height: 1.15;
+        }
+
+        .header p {
+          font-size: 15px;
+          margin-top: 10px;
+        }
+
+        .nav-card {
+          padding: 18px;
+        }
+
+        .nav-card h2 {
+          font-size: 20px;
+        }
+
+        .nav-card p {
+          margin-top: 10px;
+          line-height: 1.55;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="constellation" class="constellation" aria-hidden="true"></canvas>
+
+    <main class="portal-shell">
+      <header class="header">
+        <div class="logo" aria-hidden="true">B</div>
+
+        <h1>Templates Project Node.js</h1>
+
+        <p>A reusable template for building, testing, documenting, and publishing Node.js libraries.</p>
+
+        <p class="intro">
+          Explore the API reference generated from the public surface, review test coverage, and browse the developer
+          book for the working structure, contribution workflow, and publishing guides.
+        </p>
+      </header>
+
+      <section class="cards-grid" aria-label="Navigation cards">
+        <a class="nav-card" href="docs/">
+          <h2>API Reference</h2>
+
+          <p>Every symbol exported from <code>src/index.ts</code>, generated by TypeDoc from the source itself.</p>
+        </a>
+
+        <a class="nav-card" href="coverage/">
+          <h2>Coverage Report</h2>
+
+          <p>Review automated test coverage, code quality metrics, and validation results.</p>
+        </a>
+
+        <a class="nav-card" href="book/">
+          <h2>Developer Book</h2>
+
+          <p>Getting started, working structure, documentation and publishing guides, and release history.</p>
+        </a>
+      </section>
+
+      <footer class="page-footer">
+        <div class="footer-main">Built for modern Node.js library development</div>
+        <div class="footer-meta">
+          &copy; 2026
+          <a href="https://www.bayudwiyansatria.com" target="_blank" rel="noopener noreferrer">Bayu Dwiyan Satria</a>.
+          All rights reserved.
+        </div>
+      </footer>
+    </main>
+
+    <script>
+      ;(function () {
+        var canvas = document.getElementById('constellation')
+
+        if (!canvas) {
+          return
+        }
+
+        var ctx = canvas.getContext('2d')
+
+        if (!ctx) {
+          return
+        }
+
+        var particles = []
+        var interactiveParticle = null
+
+        var animationFrame = 0
+        var resizeTimeout = 0
+
+        var velocity = 0.3
+        var density = 12000
+        var lineThreshold = 150
+
+        var particleColor = 'hsla(0, 80%, 60%, 0.6)'
+
+        function setCanvasSize() {
+          canvas.width = window.innerWidth
+          canvas.height = window.innerHeight
+        }
+
+        function createParticles() {
+          particles = []
+
+          var count = Math.floor((canvas.width * canvas.height) / density)
+
+          for (var i = 0; i < count; i += 1) {
+            particles.push({
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height,
+              velocityX: (Math.random() - 0.5) * velocity,
+              velocityY: (Math.random() - 0.5) * velocity
+            })
+          }
+
+          interactiveParticle = {
+            x: -9999,
+            y: -9999,
+            velocityX: 0,
+            velocityY: 0,
+            isInteractive: true
+          }
+
+          particles.push(interactiveParticle)
+        }
+
+        function updateParticles() {
+          for (var i = 0; i < particles.length; i += 1) {
+            var p = particles[i]
+
+            if (p.isInteractive) {
+              continue
+            }
+
+            p.x += p.velocityX
+            p.y += p.velocityY
+
+            if (p.x < 0 || p.x > canvas.width) {
+              p.velocityX *= -1
+            }
+
+            if (p.y < 0 || p.y > canvas.height) {
+              p.velocityY *= -1
+            }
+          }
+        }
+
+        function drawConstellation() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+          for (var i = 0; i < particles.length; i += 1) {
+            var p1 = particles[i]
+
+            ctx.beginPath()
+            ctx.fillStyle = particleColor
+            ctx.globalAlpha = 0.7
+
+            ctx.arc(p1.x, p1.y, 1.5, 0, Math.PI * 2)
+
+            ctx.fill()
+
+            for (var j = i + 1; j < particles.length; j += 1) {
+              var p2 = particles[j]
+
+              var dx = p1.x - p2.x
+              var dy = p1.y - p2.y
+
+              var dist = Math.sqrt(dx * dx + dy * dy)
+
+              if (dist < lineThreshold) {
+                ctx.beginPath()
+
+                ctx.strokeStyle = particleColor
+
+                ctx.globalAlpha = (lineThreshold - dist) / lineThreshold
+
+                ctx.lineWidth = 0.7
+
+                ctx.moveTo(p1.x, p1.y)
+                ctx.lineTo(p2.x, p2.y)
+
+                ctx.stroke()
+              }
+            }
+          }
+
+          ctx.globalAlpha = 1
+        }
+
+        function animate() {
+          updateParticles()
+          drawConstellation()
+
+          animationFrame = window.requestAnimationFrame(animate)
+        }
+
+        function initConstellation() {
+          setCanvasSize()
+          createParticles()
+
+          if (animationFrame) {
+            window.cancelAnimationFrame(animationFrame)
+          }
+
+          animate()
+        }
+
+        function handleMouseMove(event) {
+          if (!interactiveParticle) {
+            return
+          }
+
+          interactiveParticle.x = event.clientX
+          interactiveParticle.y = event.clientY
+        }
+
+        function handleResize() {
+          if (resizeTimeout) {
+            window.clearTimeout(resizeTimeout)
+          }
+
+          resizeTimeout = window.setTimeout(function () {
+            if (animationFrame) {
+              window.cancelAnimationFrame(animationFrame)
+            }
+
+            setCanvasSize()
+            createParticles()
+            animate()
+          }, 250)
+        }
+
+        window.addEventListener('mousemove', handleMouseMove)
+        window.addEventListener('resize', handleResize)
+
+        initConstellation()
+      })()
+    </script>
+  </body>
+</html>
