@@ -8,8 +8,8 @@
 
 ## Release Information
 
-- [1.0.0 — Extracted from cloudflare-boilerplate](release-notes/1.0.0.md)
+- [1.0.0 — Extracted into a package of its own](release-notes/1.0.0.md)
 
 ## Changes Log
 
-- [2026-08-06 — Extraction into a package](changes-log/2026-08-06.md)
+- [2026-08-07 — Documentation tags and the type layout](changes-log/2026-08-07.md)

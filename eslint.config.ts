@@ -14,6 +14,8 @@ const KIND_TAGS = ['class', 'interface', 'typedef', 'function', 'constant']
 const REDUNDANT_TAGS = ['public', 'private', 'protected', 'property', 'prop', 'type']
 
 /**
+ * @constant
+ *
  * The documentation conventions TypeDoc cannot check for itself.
  *
  * @remarks
@@ -36,8 +38,6 @@ const REDUNDANT_TAGS = ['public', 'private', 'protected', 'property', 'prop', 't
  * - **`one-declaration-per-file`** — a file named after the thing in it makes
  *   the path the answer to "where is this", and confines a change to one
  *   interface to one file. `index.ts` barrels are exempt.
- *
- * @constant
  *
  * @author Bayu Dwiyan Satria
  * @version 1.0.0
@@ -141,6 +141,8 @@ const documentation = {
 }
 
 /**
+ * @constant
+ *
  * ESLint flat configuration.
  *
  * Replaces the former `.eslintrc.json` / `.eslintignore` pair, which ESLint 10
@@ -231,20 +233,22 @@ export default tseslint.config(
   /**
    * Kernel purity.
    *
-   * This package exists to be the layer every other one can depend on, which
-   * only holds while it names no vendor and no HTTP framework. A capability here
+   * This package is the layer every other one depends on, which holds only while
+   * it names no vendor, no runtime, and no HTTP framework. A capability here
    * says *what* the application needs — a cache, a queue, relational storage —
-   * and an adapter package elsewhere says what provides it.
+   * and an adapter package says what provides it.
    *
-   * The rule is written against the vendors that have actually been reached for:
-   * `@cloudflare/workers-types` and `hono`, both of which belong in
-   * `@bayudwiyansatria/cloudflare`. It is a lint rule rather than a note in a
-   * comment because the whole value of the boundary is that it holds under later
-   * edits, and the import that breaks it looks exactly like every other import
-   * at the point it is written.
+   * The list below names the vendors that have actually been reached for so far.
+   * It is not exhaustive and does not need to be: it is a tripwire for the
+   * common cases, not a proof. Extend it when a new adapter arrives.
    *
-   * If the kernel appears to need one of these, the answer is a new interface in
-   * `capabilities/` and an implementation on the far side of the boundary.
+   * A lint rule rather than a note in a comment, because the boundary is only
+   * worth anything if it holds under later edits — and the import that breaks it
+   * looks like every other import at the point it is written.
+   *
+   * When the kernel seems to need one of these, the answer is a new interface in
+   * `src/types/capabilities/` and an implementation on the far side of the
+   * boundary.
    */
   {
     files: ['src/**/*.ts'],
@@ -254,9 +258,65 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: ['@cloudflare/*', 'hono', 'hono/*', 'cloudflare:*'],
+              group: [
+                '@cloudflare/*',
+                'cloudflare:*',
+                '@aws-sdk/*',
+                '@google-cloud/*',
+                'hono',
+                'hono/*',
+                'express',
+                'fastify'
+              ],
               message:
-                'The kernel must name no vendor and no HTTP framework. Describe what you need as an interface in src/capabilities/ and let an adapter package implement it.'
+                'The kernel must name no vendor, runtime, or HTTP framework. Describe what you need as an interface in src/types/capabilities/ and let an adapter package implement it.'
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  /**
+   * The leaf-layer boundary.
+   *
+   * `types/`, `constants/`, `exceptions/`, `security/`, and `utils/` describe
+   * what the library exchanges, what it holds fixed, what it raises, and what it
+   * computes. None of them is *the library doing something* — that is `core/`.
+   *
+   * Dependency arrows point into these five and never back out, which is what
+   * lets any of them be read, tested, or lifted elsewhere without dragging the
+   * configuration engine and the logger along.
+   *
+   * A lint rule rather than a convention, for the usual reason: a convention
+   * lasts only as long as everyone remembers it, and the import that breaks the
+   * boundary looks exactly like every other import at the point it is written.
+   *
+   * ```ts
+   * // src/utils/Text.ts — fails `npm run lint`
+   * import { resolve } from '@/core'
+   * ```
+   *
+   * If a leaf genuinely needs something from `core/`, take it as an argument, or
+   * move the shared piece down into a leaf.
+   */
+  {
+    files: [
+      'src/types/**/*.ts',
+      'src/constants/**/*.ts',
+      'src/exceptions/**/*.ts',
+      'src/security/**/*.ts',
+      'src/utils/**/*.ts'
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/core', '@/core/*', '@/index'],
+              message:
+                'A leaf layer must not import from core/. Take what you need as an argument, or move the shared piece down into types/, constants/, exceptions/, security/, or utils/.'
             }
           ]
         }

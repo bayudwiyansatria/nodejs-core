@@ -8,6 +8,8 @@ import eslint from '@rollup/plugin-eslint'
 import serve from 'rollup-plugin-serve'
 
 /**
+ * @module
+ *
  * Rollup build configuration.
  *
  * Builds `src/index.ts` — the library's entire published surface — into

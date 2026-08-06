@@ -11,7 +11,7 @@ configure(defaults, overrides)   ← the application calls this, once, at startu
   the registry                    ← module state inside this package
         │
         ▼
-resolve<S>('kv')                  ← everything downstream reads this
+resolve<S>('cache')               ← everything downstream reads this
 ```
 
 The surface is assembled by the **application**, because the application is the only layer allowed to know every half of
@@ -20,9 +20,9 @@ package contributes the platform-backed ones:
 
 ```ts
 import { configure, systemDefaults } from '@bayudwiyansatria/core'
-import { cloudflareDefaults } from '@bayudwiyansatria/cloudflare'
+import { platformDefaults } from '<the-adapter-package>'
 
-configure({ ...systemDefaults, ...cloudflareDefaults }, overrides)
+configure({ ...systemDefaults, ...platformDefaults }, overrides)
 ```
 
 A flat merge is safe because the halves share no key: this package owns `logging` and `security`, the adapter owns the
@@ -47,12 +47,12 @@ Callers never learn whether a value came from a default or an override. They get
 Resolution is **per field**, not per module:
 
 ```ts
-configure({ kv: { binding: 'KV', expirationTtl: 300 } }, { kv: { expirationTtl: 60 } })
+configure({ cache: { driver: 'memory', ttl: 300 } }, { cache: { ttl: 60 } })
 
-resolve('kv') // { binding: 'KV', expirationTtl: 60 }
+resolve('cache') // { driver: 'memory', ttl: 60 }
 ```
 
-An override that names only `expirationTtl` keeps the default `binding`, so a partial override never silently blanks the
+An override that names only `ttl` keeps the default `driver`, so a partial override never silently blanks the
 rest of a module.
 
 An override field set explicitly to `undefined` is **ignored**, for the same reason — writing `{ model: undefined }` is
@@ -71,7 +71,7 @@ This is harder than it sounds, because ES imports are hoisted:
 
 ```ts
 import { configure } from '@bayudwiyansatria/core'
-import { KVService } from '@bayudwiyansatria/cloudflare' // evaluates that package NOW
+import { CacheService } from '<the-adapter-package>' // evaluates that package NOW
 
 configure(...) // runs after both modules have fully initialised
 ```
@@ -80,7 +80,7 @@ Nothing an application writes can make a statement run before its own imports. T
 
 **For adapter authors.** Never call `resolve()` at module scope or in a constructor. Adapters create accessors at module
 scope so one instance is reused across requests, and if that resolved settings, the *import statement* would throw.
-Defer to first use instead — `@bayudwiyansatria/cloudflare` does this with a memoised `lazySettings()` getter.
+Defer to first use instead, with a memoised getter that calls `resolve()` the first time a setting is read.
 
 **For application authors.** Put the `configure()` call in your configuration module and have anything that reads
 settings while initialising import that module:
@@ -114,7 +114,7 @@ only two ways to reach it, and the message names both because they present ident
 The second is the nastier one, because nothing about the stack trace suggests a packaging problem.
 
 Failing loudly here is deliberate. Returning `undefined` would push the fault downstream to whichever binding first
-dereferenced the settings, where the message would name a KV namespace rather than the missing `configure()` call that
+dereferenced the settings, where the message would name the cache rather than the missing `configure()` call that
 actually caused it.
 
 ## Adding a setting
