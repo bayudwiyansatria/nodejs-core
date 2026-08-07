@@ -48,11 +48,8 @@ COPY docs docs
 # Build
 RUN npm ci
 
-RUN npm run build
-
-RUN npm run test
-
 RUN npm run build:docs
+RUN npm run build:docs:coverage
 RUN npm run build:docs:book
 
 #-----------------------------------------------------------------------------------------------------------------------

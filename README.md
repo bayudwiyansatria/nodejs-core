@@ -24,15 +24,15 @@ declaration artifacts under `lib/`.
 
 ## Included in This Package
 
-| Category      | Exports                                                                                    |
-| ------------- | ------------------------------------------------------------------------------------------ |
-| Contracts     | `Service`, `APIResponse`                                                                    |
-| Capabilities  | `Capability` plus ten interfaces over it, and four `Noop*` implementations                  |
+| Category      | Exports                                                                                      |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| Contracts     | `Service`, `APIResponse`                                                                     |
+| Capabilities  | `Capability` plus ten interfaces over it, and four `Noop*` implementations                   |
 | Configuration | `configure`, `resolve`, `systemDefaults`, `SystemConfiguration`, `Overrides`, settings types |
-| Observability | `Logger`, `LogContext`, `LogLevel`, `LoggingSettings`                                       |
-| Security      | `timingSafeEqual`                                                                           |
-| Errors        | `MissingCapabilityError`, `ConfigurationError`                                              |
-| Utilities     | `Signature`, `Text`, `Time`                                                                 |
+| Observability | `Logger`, `LogContext`, `LogLevel`, `LoggingSettings`                                        |
+| Security      | `timingSafeEqual`                                                                            |
+| Errors        | `MissingCapabilityError`, `ConfigurationError`                                               |
+| Utilities     | `Signature`, `Text`, `Time`                                                                  |
 
 Tooling and project baseline:
 
@@ -220,7 +220,7 @@ alternative is unsafe. JWT and PKI helpers would go there too.
 - `npm run format` Run Prettier over config, `src`, and `test`
 - `npm run build:docs` Generate the TypeDoc API reference into `dist/docs`
 - `npm run build:docs:book` Build the HonKit developer book into `dist/book`
-- `npm run build:coverage` Produce the coverage report into `dist/coverage`
+- `npm run build:docs:coverage` Produce the coverage report into `dist/coverage`
 - `npm run build:static` Build every static artifact into `dist/` (`index.html`, `docs/`, `book/`, `coverage/`)
 - `npm run build:all` Build the library and the static site
 - `npm run docker:build:docs` Build the docs site image
@@ -248,14 +248,18 @@ npm run build:docs
 `typedoc.json` sets `treatWarningsAsErrors` and `validation.notDocumented`, so an undocumented export or a broken
 cross-reference fails `npm run build:docs`.
 
-CI runs on push to `master` ([Main](.github/workflows/main.yml)) and on `feature/**` and `hotfix/**` branches
-([Features](.github/workflows/features.yml)). Releases are cut manually through the Release Dispatch workflow.
+CI runs on push to `master`
+([Main](https://github.com/bayudwiyansatria/nodejs-core/blob/master/.github/workflows/main.yml)) and on `feature/**` and
+`hotfix/**` branches
+([Features](https://github.com/bayudwiyansatria/nodejs-core/blob/master/.github/workflows/features.yml)). Releases are
+cut manually through the Release Dispatch workflow.
 
 ## Documentation
 
 - [Docs Home](docs/README.md)
 - [Summary](docs/SUMMARY.md)
-- [Configuration Reference](docs/reference/configuration.md) — `configure`, `resolve`, merge semantics, and the ordering constraint
+- [Configuration Reference](docs/reference/configuration.md) — `configure`, `resolve`, merge semantics, and the ordering
+  constraint
 - [Latest Release Notes](docs/release-notes/1.0.0.md)
 - [Changes Log](docs/changes-log/2026-08-07.md)
 - [API Reference](https://bayudwiyansatria.github.io/nodejs-core) — generated from source

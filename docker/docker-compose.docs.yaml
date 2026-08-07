@@ -1,14 +1,14 @@
-name: templates-project-nodejs
+name: nodejs-core
 services:
   app-docs:
-    image: bayudwiyansatria/templates-project-nodejs:docs
+    image: bayudwiyansatria/nodejs-core:docs
     build:
       context: ../
       # Bug: https://github.com/orgs/community/discussions/26634
       args: []
       #dockerfile: Dockerfile
       dockerfile: docker/docs.Dockerfile
-    container_name: templates-project-nodejs-docs
+    container_name: nodejs-core-docs
     ports:
       - "80:80"
     networks:
