@@ -89,6 +89,7 @@ export type {
   CacheStore,
   CoordinationStore,
   DataStore,
+  DeliverySettings,
   InferenceEngine,
   LogContext,
   LoggingSettings,

@@ -33,16 +33,29 @@ export const systemDefaults: SystemConfiguration = {
   },
 
   /**
+   * Outbound delivery — ten seconds an attempt, two retries, and a backoff
+   * doubling from a quarter of a second. Worst case is a little over thirty
+   * seconds, so `timeoutMs` is the one to tighten when callers are less patient
+   * than that.
+   *
+   * `userAgent` is a placeholder, like `logging.service` above. Override it, or
+   * the far end's access log says nothing about who is calling.
+   */
+  delivery: {
+    timeoutMs: 10000,
+    retries: 2,
+    retryBackoffMs: 250,
+    userAgent: 'app'
+  },
+
+  /**
    * Security — API-key authentication on `/api/v1/*`, with the documentation
    * routes left public. Nothing is exempted and every origin is allowed, so a
    * project opts into both by naming them; see `SecuritySettings`.
    */
   security: {
     urlPattern: '/api/v1/*',
-    publicRoutes: [
-      '/swagger-ui/*', 
-      '/v3/api-docs/*'
-    ],
+    publicRoutes: ['/swagger-ui/*', '/v3/api-docs/*'],
     excludedRoutes: [],
     allowedOrigins: []
   }

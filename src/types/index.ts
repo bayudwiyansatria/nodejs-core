@@ -28,6 +28,7 @@
  * @since 1.0.0
  */
 export type { APIResponse } from '@/types/APIResponse'
+export type { DeliverySettings } from '@/types/DeliverySettings'
 export type { Overrides } from '@/types/Overrides'
 export type { SecuritySettings } from '@/types/SecuritySettings'
 export type { SystemConfiguration } from '@/types/SystemConfiguration'
