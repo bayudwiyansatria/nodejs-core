@@ -13,5 +13,6 @@
 
 ## Changes Log
 
+- [2026-08-20 — One release-notes format across the family](changes-log/2026-08-20.md)
 - [2026-08-08 — `DeliverySettings`](changes-log/2026-08-08.md)
 - [2026-08-07 — Documentation tags and the type layout](changes-log/2026-08-07.md)
