@@ -8,12 +8,15 @@
 
 ## Release Information
 
+- [1.2.1 — A flat line, a readable message, and a field list](release-notes/1.2.1.md)
 - [1.2.0 — `event`, not `message`, and a redaction pass](release-notes/1.2.0.md)
 - [1.1.0 — Outbound delivery is configurable](release-notes/1.1.0.md)
 - [1.0.0 — Extracted into a package of its own](release-notes/1.0.0.md)
 
 ## Changes Log
 
+- [2026-08-24 — What the log lines actually looked like](changes-log/2026-08-24.md)
+- [2026-08-23 — `Logger` stops restating what the runtime knows](changes-log/2026-08-23.md)
 - [2026-08-20 — One release-notes format across the family](changes-log/2026-08-20.md)
 - [2026-08-08 — `DeliverySettings`](changes-log/2026-08-08.md)
 - [2026-08-07 — Documentation tags and the type layout](changes-log/2026-08-07.md)

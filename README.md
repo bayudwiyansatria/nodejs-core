@@ -29,7 +29,7 @@ declaration artifacts under `lib/`.
 | Contracts     | `Service`, `APIResponse`                                                                     |
 | Capabilities  | `Capability` plus ten interfaces over it, and four `Noop*` implementations                   |
 | Configuration | `configure`, `resolve`, `systemDefaults`, `SystemConfiguration`, `Overrides`, settings types |
-| Observability | `Logger`, `LogContext`, `LogLevel`, `LoggingSettings`                                        |
+| Observability | `Logger`, `LogFields`, `LogContext`, `LogLevel`, `LoggingSettings`                           |
 | Security      | `redact`, `timingSafeEqual`                                                                  |
 | Errors        | `MissingCapabilityError`, `ConfigurationError`                                               |
 | Utilities     | `Signature`, `Text`, `Time`                                                                  |
@@ -67,8 +67,8 @@ import { platformDefaults } from '<the-adapter-package>'
 // Once, at startup, before anything reads a setting.
 configure({ ...systemDefaults, ...platformDefaults }, { logging: { service: 'article-api' } })
 
-const log = Logger.fromEnv(env, { service: 'ArticleService' })
-log.info('ready')
+const log = Logger.fromEnv(env, { component: 'ArticleService' })
+log.info('service.started')
 ```
 
 ## Usage
@@ -96,19 +96,42 @@ means either `configure()` has not run yet, or two copies of this package are lo
 
 ### Logging
 
-`Logger` writes structured JSON lines. `fromEnv` reads `LOG_LEVEL` off the environment object you hand it and falls back
-to the configured level. Levels are `debug`, `info`, `warn`, `error`.
+`Logger` writes structured JSON lines, flat — a field is indexed as `id`, not `data.id`. `fromEnv` reads `LOG_LEVEL`,
+`SERVICE_NAME` and `LOG_FIELDS` off the environment object you hand it, falling back to the configured surface. Levels
+are `debug`, `info`, `warn`, `error`.
 
 ```ts
 import { Logger } from '@bayudwiyansatria/core'
 
-const log = Logger.fromEnv(env, { service: 'ArticleService' })
+const log = Logger.fromEnv(env, { component: 'ArticleService' })
 
-log.info('article created', { id: 42 })
-log.error('upstream failed', { status: 502 })
+log.info('article.created', { id: 42 })
+log.error('external_api.error', { status: 502 }, `Upstream returned ${status}`)
 
 const scoped = log.child({ requestId }) // inherits context, adds its own
 ```
+
+Three arguments, and each answers a different question:
+
+| Argument  | For                                      | Example                 |
+| --------- | ---------------------------------------- | ----------------------- |
+| `event`   | machines — filtering, grouping, counting | `article.created`       |
+| `data`    | the facts that vary per call             | `{ id: 42 }`            |
+| `message` | people — the column a log viewer shows   | `Upstream returned 502` |
+
+`message` is optional and falls back to the event name, so the column is never blank.
+
+**Which ambient fields reach the line** is a deployment's decision, via `LOG_FIELDS` or `logging.fields`:
+
+```bash
+LOG_FIELDS="requestId,method,path"   # only these
+LOG_FIELDS="*"                       # everything (the default)
+LOG_FIELDS=""                        # level, event and message alone
+```
+
+It governs _context_ — what `fromEnv` and `child` stamp on every line. What a call site passes to one log call is always
+emitted. The kernel narrows nothing by itself; an adapter that knows what its runtime already records supplies its own
+list.
 
 ### Services
 
