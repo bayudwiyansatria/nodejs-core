@@ -5,12 +5,45 @@ All notable changes to this project will be documented in this file.
 See detailed changes in [docs/changes-log/](docs/changes-log/) for each work session, and
 [docs/release-notes/](docs/release-notes/) for each release.
 
+## [1.2.0] - 2026-08-23
+
+Three changes to `Logger`, all consequences of one observation: the runtimes this kernel is deployed on already know
+things it was restating. See the [release notes](docs/release-notes/1.2.0.md).
+
+### Breaking Changes
+
+- **Lines carry `event` where they carried `message`**, and the value is a dotted event name rather than a sentence. The
+  method signatures are unchanged, so nothing stops compiling; what changes is the field a query filters on. A collector
+  that indexes JSON fields turns `event` into a column, which makes `event = notification.failed` a filter and the count
+  of one event a series — neither of which a prose message can be
+- **The service name comes from `SERVICE_NAME` in the environment**, ahead of `logging.service` on the configuration
+  surface. A name in the environment sits beside the deployment's own name, where a rename that misses it shows up in
+  the same diff; a constant compiled in from `config/` sits in a file a rename does not touch, which is how a Worker
+  spent production calling itself `cloudflare-boilerplate`. `LoggingSettings.service` is now optional and
+  `systemDefaults` supplies none, so code reading it reads `string | undefined`
+- **A line with no name available reads `service: "unknown"`** rather than omitting the field, so a forgotten
+  `SERVICE_NAME` is a query result rather than an invisible gap
+
+### Added
+
+- **`redact`** — scrubs credential-named fields out of a structure bound for a log stream, matching on field names
+  separator- and case-insensitively, walking arrays and nested objects to a bounded depth, and returning `Error` values
+  untouched. In `security/` rather than `utils/` on the same intent test as `timingSafeEqual`: it exists because the
+  obvious alternative is unsafe
+- **`LogContext.component`** — which part of an application wrote a line, where `service` says which service. Call sites
+  previously overwrote `service` with a class name, so the field meant two different things depending on the line
+
+### Changed
+
+- **`Logger` runs every payload through `redact`** before serialising. Redaction first, then `Error` expansion — the
+  order matters, because redaction leaves errors alone precisely so the second pass can recognise them
+
 ## [Unreleased]
 
 ### Changed
 
-- **Release notes rewritten to the family's section skeleton** — `# Release Notes` / `## Version <x.y.z>` with the
-  emoji sections, adopted from `@bayudwiyansatria/auth-client`. Documentation only; no prose was cut and no source,
+- **Release notes rewritten to the family's section skeleton** — `# Release Notes` / `## Version <x.y.z>` with the emoji
+  sections, adopted from `@bayudwiyansatria/auth-client`. Documentation only; no prose was cut and no source,
   configuration, or exported symbol changed
 - **The `1.1.0` section of this file, previously missing**, written up from `docs/release-notes/1.1.0.md` and
   `docs/changes-log/2026-08-08.md`
@@ -50,8 +83,8 @@ See [docs/release-notes/1.1.0.md](docs/release-notes/1.1.0.md) for full release 
 
 ## [1.0.0] - 2026-08-07
 
-First release of `@bayudwiyansatria/core`, the vendor-neutral kernel. The code previously lived inside an application
-as `src/core/system/`; this repository previously held the Node.js library template, whose scaffolding was replaced and
+First release of `@bayudwiyansatria/core`, the vendor-neutral kernel. The code previously lived inside an application as
+`src/core/system/`; this repository previously held the Node.js library template, whose scaffolding was replaced and
 whose placeholder source was removed.
 
 ### Added
@@ -60,8 +93,7 @@ whose placeholder source was removed.
   `InferenceEngine`, `MessageQueue`, `ObjectStore`, `RateLimiter`, `SqlConnectionProvider`, `TelemetrySink`,
   `VectorIndex`), plus `RequestMetadata` and the shapes their calls exchange
 - **Configuration** — `configure`, `resolve`, `systemDefaults`, and the settings shapes. `configure()` is new: it
-  replaces `resolve()`'s import of the application's own `src/config/`, which a package cannot reach across its
-  boundary
+  replaces `resolve()`'s import of the application's own `src/config/`, which a package cannot reach across its boundary
 - **Contracts** — `Service` and the `APIResponse` envelope its `ok()` / `fail()` builders produce
 - **No-op implementations** — `NoopCacheStore`, `NoopMessageQueue`, `NoopRateLimiter`, `NoopTelemetrySink`, each
   degrading exactly as its interface documents
@@ -78,8 +110,8 @@ whose placeholder source was removed.
 - `resolve()` is generic over the settings shape (`resolve<CacheSettings>('cache')`), since the kernel cannot know the
   assembled surface
 - `systemDefaults.logging.service` is `'app'` rather than the name of the application this came from
-- `Signature` derives its key type from `crypto.subtle` rather than the ambient `CryptoKey`, which is only global when
-  a runtime-specific lib is in scope
+- `Signature` derives its key type from `crypto.subtle` rather than the ambient `CryptoKey`, which is only global when a
+  runtime-specific lib is in scope
 
 ### Notes
 

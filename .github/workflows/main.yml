@@ -2,7 +2,7 @@ name: Main
 on:
   push:
     branches:
-    - master
+      - master
 jobs:
   #---------------------------------------------------------------------------------------------------------------------
   # Build
@@ -20,7 +20,7 @@ jobs:
   docs:
     name: Docs
     needs:
-    - build
+      - build
     uses: bayudwiyansatria/.github/.github/workflows/build-node-docs.yml@master
     with:
       NODE_VERSION: 21
@@ -31,12 +31,21 @@ jobs:
   #---------------------------------------------------------------------------------------------------------------------
   test:
     name: Test
-    needs: 
-    - build
+    needs:
+      - build
     uses: bayudwiyansatria/.github/.github/workflows/test-node-npm.yml@master
     with:
       NODE_VERSION: 21
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  
+  #---------------------------------------------------------------------------------------------------------------------
+  # Code Analysis
+  #---------------------------------------------------------------------------------------------------------------------
+  code-analysis:
+    name: Code Analysis
+    needs:
+      - test
+    uses: bayudwiyansatria/.github/.github/workflows/code-analysis-codecov.yml@master
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
