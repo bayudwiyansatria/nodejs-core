@@ -36,10 +36,10 @@ describe('Logger', () => {
   it('emits one JSON object through the method matching the level', () => {
     const log = Logger.fromEnv({})
 
-    log.info('started')
+    log.info('service.started')
 
     expect(captured.info).toHaveLength(1)
-    expect(lineFrom('info')).toMatchObject({ level: 'info', message: 'started' })
+    expect(lineFrom('info')).toMatchObject({ level: 'info', event: 'service.started' })
   })
 
   it('routes each level to its own console method', () => {
@@ -103,12 +103,62 @@ describe('Logger', () => {
     expect(captured.error).toHaveLength(1)
   })
 
-  it('stamps the configured service name on every line', () => {
+  /*
+   * Every line says which deployment wrote it, so a line still means something
+   * once it has left the console it was written to — in an export, a Logpush
+   * sink, or a stream shared with another service.
+   */
+  it('stamps the service name from the environment on every line', () => {
+    Logger.fromEnv({ SERVICE_NAME: 'mcp-server' }).info('service.started')
+
+    expect(lineFrom('info').service).toBe('mcp-server')
+  })
+
+  it('falls back to the configured service name with no environment', () => {
     configure(systemDefaults, { logging: { service: 'article-service' } })
 
     Logger.fromEnv({}).info('tagged')
 
     expect(lineFrom('info').service).toBe('article-service')
+  })
+
+  /*
+   * The environment wins, and the order is the whole point: `SERVICE_NAME` sits
+   * beside the deployment's own name, where a rename that misses it is visible
+   * in the same diff. A constant compiled in from `config/` is in a file a
+   * rename does not touch — which is how a Worker spent production calling
+   * itself `cloudflare-boilerplate`.
+   */
+  it('prefers the environment over a stale configured name', () => {
+    configure(systemDefaults, { logging: { service: 'cloudflare-boilerplate' } })
+
+    Logger.fromEnv({ SERVICE_NAME: 'cloud-cost-worker' }).info('tagged')
+
+    expect(lineFrom('info').service).toBe('cloud-cost-worker')
+  })
+
+  /*
+   * The failure this guards is silence. A deployment that forgets
+   * `SERVICE_NAME` used to emit lines with the key simply missing: ordinary
+   * looking, healthy looking, and useless the moment two services shared a
+   * stream. `unknown` makes it a value a query can find.
+   */
+  it('says so when neither the environment nor the surface names one', () => {
+    Logger.fromEnv({}).info('untagged')
+
+    expect(lineFrom('info').service).toBe('unknown')
+  })
+
+  it.each([[''], ['   ']])('treats %p as unnamed rather than as a name', value => {
+    Logger.fromEnv({ SERVICE_NAME: value }).info('untagged')
+
+    expect(lineFrom('info').service).toBe('unknown')
+  })
+
+  it('never leaves the service key off a line', () => {
+    Logger.fromEnv(null).info('untagged')
+
+    expect(lineFrom('info')).toHaveProperty('service')
   })
 
   it('carries context onto every line', () => {
@@ -120,9 +170,9 @@ describe('Logger', () => {
   it('adds context in a child while keeping the parent threshold', () => {
     const log = Logger.fromEnv({}, { requestId: 'abc123' })
 
-    log.child({ service: 'ArticleService' }).info('derived')
+    log.child({ component: 'ArticleService' }).info('derived')
 
-    expect(lineFrom('info')).toMatchObject({ requestId: 'abc123', service: 'ArticleService' })
+    expect(lineFrom('info')).toMatchObject({ requestId: 'abc123', component: 'ArticleService' })
   })
 
   it('does not let a child leak its context back into the parent', () => {
@@ -135,9 +185,20 @@ describe('Logger', () => {
   })
 
   it('nests structured data under a data key', () => {
-    Logger.fromEnv({}).info('created', { id: 7 })
+    Logger.fromEnv({}).info('article.created', { id: 7 })
 
     expect(lineFrom('info').data).toEqual({ id: 7 })
+  })
+
+  /*
+   * The redaction pass is `redact`'s to prove in detail; what belongs here is
+   * that the logger actually runs it, because a payload reaching the stream
+   * unscrubbed is not something a later fix can take back.
+   */
+  it('scrubs credential-shaped fields out of the payload', () => {
+    Logger.fromEnv({}).info('external_api.request', { provider: 'telegram', apiKey: 'live-key' })
+
+    expect(lineFrom('info').data).toEqual({ provider: 'telegram', apiKey: '[redacted]' })
   })
 
   /*

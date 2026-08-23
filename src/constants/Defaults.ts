@@ -22,14 +22,18 @@ export const systemDefaults: SystemConfiguration = {
    * Logging — structured lines to the runtime's log stream at `info` and above.
    * `LOG_LEVEL` in the environment overrides this per deployment.
    *
-   * `service` is the field every application is expected to override; it names
-   * the emitter in the logstream, and the placeholder here is deliberately
-   * generic so an un-overridden deployment reads as unconfigured rather than as
-   * some other project.
+   * `service` has no default, and that is not the same as it being unused.
+   * Every line carries one; it comes from `SERVICE_NAME` in the environment,
+   * beside the deployment's own name, so a rename cannot leave it behind. A
+   * default here would be a name to inherit and forget — which is exactly how
+   * a Worker came to spend production calling itself `cloudflare-boilerplate`.
+   *
+   * An application with no environment to read sets `logging.service` in an
+   * override instead, and one whose stream carries nothing else can leave both
+   * unset.
    */
   logging: {
-    level: 'info',
-    service: 'app'
+    level: 'info'
   },
 
   /**

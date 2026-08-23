@@ -30,7 +30,7 @@ declaration artifacts under `lib/`.
 | Capabilities  | `Capability` plus ten interfaces over it, and four `Noop*` implementations                   |
 | Configuration | `configure`, `resolve`, `systemDefaults`, `SystemConfiguration`, `Overrides`, settings types |
 | Observability | `Logger`, `LogContext`, `LogLevel`, `LoggingSettings`                                        |
-| Security      | `timingSafeEqual`                                                                            |
+| Security      | `redact`, `timingSafeEqual`                                                                  |
 | Errors        | `MissingCapabilityError`, `ConfigurationError`                                               |
 | Utilities     | `Signature`, `Text`, `Time`                                                                  |
 
@@ -157,6 +157,7 @@ anything, which is useful in tests and in deployments where the capability is no
 - `Text.truncate`, `Text.trim`, `Text.isBlank`
 - `Time.now`, `Time.nowIso`, `Time.since`
 - `timingSafeEqual(a, b)` for constant-time string comparison
+- `redact(data)` to scrub credential-named fields out of anything bound for a log stream
 
 ## Project Structure
 
@@ -169,7 +170,7 @@ src/
     capabilities/       The capability interfaces and their supporting shapes
   constants/            systemDefaults
   exceptions/           MissingCapabilityError, ConfigurationError
-  security/             timingSafeEqual
+  security/             redact, timingSafeEqual
   utils/                Signature, Text, Time
 test/                   Jest specs (*.spec.ts) mirroring src/
 docs/                   Documentation and release history
@@ -207,7 +208,8 @@ import { resolve } from '@/core'
 If a leaf genuinely needs something from `core/`, take it as an argument or move the shared piece down into a leaf.
 
 `security/` is separate from `utils/` on intent rather than size. `timingSafeEqual` exists because the obvious
-alternative is unsafe. JWT and PKI helpers would go there too.
+alternative is unsafe, and `redact` for the same reason — handing a payload straight to a logger leaks credentials into
+a stream nobody re-reads before it ships. JWT and PKI helpers would go there too.
 
 ## Available Scripts
 

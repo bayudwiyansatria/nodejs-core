@@ -8,6 +8,7 @@
 
 ## Release Information
 
+- [1.2.0 — `event`, not `message`, and a redaction pass](release-notes/1.2.0.md)
 - [1.1.0 — Outbound delivery is configurable](release-notes/1.1.0.md)
 - [1.0.0 — Extracted into a package of its own](release-notes/1.0.0.md)
 

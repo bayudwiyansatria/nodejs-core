@@ -5,8 +5,8 @@
  *
  * @remarks
  * Three shapes for one subject: {@link LogLevel} is the severity scale,
- * {@link LoggingSettings} is the threshold and service name a deployment
- * settles, and {@link LogContext} is the ambient fields attached to every line.
+ * {@link LoggingSettings} is the threshold a deployment settles, and
+ * {@link LogContext} is the ambient fields attached to every line.
  *
  * All three are plain data, declared here rather than beside
  * [`Logger`](../../core/Logger.ts) so the configuration layer can read the

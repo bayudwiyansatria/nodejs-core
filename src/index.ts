@@ -73,7 +73,7 @@ export { ConfigurationError, MissingCapabilityError } from '@/exceptions'
 /**
  * Security
  */
-export { timingSafeEqual } from '@/security'
+export { redact, timingSafeEqual } from '@/security'
 
 /**
  * Utilities
