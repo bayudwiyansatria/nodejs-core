@@ -1,3 +1,4 @@
+import { LogFields } from '@/core/LogFields'
 import { redact } from '@/security/redact'
 import { resolve } from '@/core/resolve'
 import { Text } from '@/utils/Text'
@@ -42,6 +43,22 @@ const WEIGHT: Record<LogLevel, number> = {
 const UNNAMED = 'unknown'
 
 /**
+ * Keys the line owns, which nothing else may occupy.
+ *
+ * @remarks
+ * Context and payload are both merged onto the line, and either could carry a
+ * key named `level` or `message` — a forwarded upstream record especially,
+ * where those names are exactly what a log line calls its own fields. Letting
+ * one through would leave a line whose severity disagrees with the stream it
+ * was written to, which is worse than losing the field: a collector indexes the
+ * value it sees, so an `error` payload could arrive filed as `info` and never
+ * surface in a severity filter.
+ *
+ * These three are written first and re-asserted against every merged key.
+ */
+const RESERVED = new Set(['level', 'event', 'message'])
+
+/**
  * @class
  *
  * Structured, level-classified logging — and nothing else.
@@ -53,33 +70,56 @@ const UNNAMED = 'unknown'
  * for lines that have to be read back verbatim.
  *
  * @remarks
- * ## An event name, not a sentence
+ * ## An event name *and* a sentence
  *
  * The first argument is an **event name** — a stable, lowercase, dotted
- * identifier such as `notification.sent` or `external_api.error` — and it is
- * emitted under the `event` key. A collector that indexes JSON fields turns
- * that key into a column, so `event = notification.failed` becomes a filter
- * rather than a substring search, and the count of one event over time becomes
- * a series. A prose message can be neither: `'Failed to send notification for
- * user 7'` is a different string on every line it is written.
+ * identifier such as `notification.sent` or `external_api.error` — emitted
+ * under the `event` key. A collector that indexes JSON fields turns that key
+ * into a column, so `event = notification.failed` becomes a filter rather than
+ * a substring search, and the count of one event over time becomes a series. A
+ * prose sentence can be neither: `'Failed to send notification for user 7'` is
+ * a different string on every line it is written.
  *
- * Anything that varies belongs in `data`, where it stays structured and
- * searchable on its own.
+ * That is why the third argument exists rather than replacing the first. A
+ * `message` is written for whoever is *reading* the stream, and it is the only
+ * thing most log viewers show by default. Omit it and the event name stands in,
+ * so the column is never empty; supply it and the line says something in
+ * English without anyone opening it:
  *
- * ## Every line says who wrote it
+ * ```ts
+ * log.warn('external_api.error', { provider, status }, `Telegram rejected the send (${status})`)
+ * ```
  *
- * `service` names the deployment and is stamped on every line, from
- * `SERVICE_NAME` in the environment or, failing that, `logging.service` on the
- * configuration surface.
+ * Anything that varies belongs in the payload, where it stays structured and
+ * searchable on its own — never interpolated into the event name.
  *
- * A runtime often knows this already — Cloudflare Workers Logs records the
- * script name on the invocation and offers it as a column — and stamping it
- * here is a deliberate second copy. The reason is that the copy travels: a line
- * exported to a file, shipped through Logpush, or read on a runtime that has no
- * such column still says which service produced it. A record that only makes
- * sense inside one vendor's console is not a record. The cost is a field that
- * can drift from the deployment, which is why the value comes from the
- * environment rather than a constant compiled into the bundle.
+ * ## One flat object
+ *
+ * Context and payload are flattened onto the line, not nested under a wrapper,
+ * so a field is indexed as `status` rather than `data.status`.
+ *
+ * Context passes through an allow-list first; see `LogFields`. Payload never
+ * does — it was named at the call site for this one call, and dropping it there
+ * would discard the answer somebody logged the line to get.
+ *
+ * ## Which deployment wrote it
+ *
+ * `service` names the deployment, from `SERVICE_NAME` in the environment or,
+ * failing that, `logging.service` on the configuration surface. It is context,
+ * so it reaches the line only while the allow-list admits it — which the kernel
+ * default does.
+ *
+ * Some runtimes already record it: Cloudflare stamps the script name on every
+ * log record before it is stored, so a Worker that never leaves that console
+ * gains nothing from a second copy and can drop the field. A deployment whose
+ * lines *travel* — exported to a file, shipped through Logpush, read on a
+ * runtime with no such column — should keep it, because a record that only
+ * makes sense inside one vendor's console is not a record.
+ *
+ * That is the trade the allow-list exists to let a deployment make, rather than
+ * this class making it for every consumer. The value comes from the environment
+ * rather than a constant compiled into the bundle, so whichever way it is
+ * decided the name cannot drift from the deployment it describes.
  *
  * `service` answers *which service*; a line that needs to say which part of it
  * ran names a `component` in the context.
@@ -95,11 +135,13 @@ const UNNAMED = 'unknown'
  * @example
  * ```ts
  * const log = Logger.fromEnv(env, { component: 'ArticleService' })
+ *
  * log.info('article.created', { id })
+ * log.info('article.created', { id }, `Article ${id} created`)
  * ```
  *
  * @author Bayu Dwiyan Satria
- * @version 1.2.0
+ * @version 1.2.1
  * @since 1.0.0
  */
 export class Logger {
@@ -114,14 +156,21 @@ export class Logger {
   private readonly context: LogContext
 
   /**
+   * Which of those fields the deployment actually wants ingested.
+   */
+  private readonly fields: LogFields
+
+  /**
    * Constructs a Logger.
    *
    * @param threshold Minimum weight to emit.
    * @param context Fields repeated on every line.
+   * @param fields Which context fields reach the line.
    */
-  private constructor(threshold: number, context: LogContext) {
+  private constructor(threshold: number, context: LogContext, fields: LogFields) {
     this.threshold = threshold
     this.context = context
+    this.fields = fields
   }
 
   /**
@@ -129,9 +178,9 @@ export class Logger {
    *
    * @remarks
    * The parameter is structural rather than a named environment type. All this
-   * needs is a possible `LOG_LEVEL` and `SERVICE_NAME`, so asking for exactly
-   * that keeps the kernel free of any platform's environment shape — a
-   * runtime's `Env` object, a `process.env`, or a bare object literal all
+   * needs is a possible `LOG_LEVEL`, `SERVICE_NAME` and `LOG_FIELDS`, so asking
+   * for exactly that keeps the kernel free of any platform's environment shape
+   * — a runtime's `Env` object, a `process.env`, or a bare object literal all
    * satisfy it.
    *
    * The service name is read from the environment first and the configuration
@@ -148,13 +197,14 @@ export class Logger {
    * invisible one — `service = unknown` is a query that finds every
    * misconfigured deployment.
    *
-   * @param env Anything carrying an optional `LOG_LEVEL` and `SERVICE_NAME`.
-   *   Tolerates `null`.
+   * @param env Anything carrying an optional `LOG_LEVEL`, `SERVICE_NAME` and
+   *   `LOG_FIELDS`. Tolerates `null`.
    * @param context Fields to repeat on every line.
-   * @returns A logger honouring the configured (or `LOG_LEVEL`) threshold.
+   * @returns A logger honouring the configured (or `LOG_LEVEL`) threshold, and
+   *   emitting the context fields the deployment declared.
    */
   public static fromEnv(
-    env: { LOG_LEVEL?: string; SERVICE_NAME?: string } | null | undefined,
+    env: { LOG_LEVEL?: string; SERVICE_NAME?: string; LOG_FIELDS?: string } | null | undefined,
     context: LogContext = {}
   ): Logger {
     const settings = resolve<LoggingSettings>('logging')
@@ -162,7 +212,7 @@ export class Logger {
     const named = (env && env.SERVICE_NAME) || settings.service
     const service = Text.isBlank(named) ? UNNAMED : (named as string)
 
-    return new Logger(WEIGHT[level], { service, ...context })
+    return new Logger(WEIGHT[level], { service, ...context }, LogFields.fromEnv(env))
   }
 
   /**
@@ -172,7 +222,7 @@ export class Logger {
    * @returns The derived logger.
    */
   public child(context: LogContext): Logger {
-    return new Logger(this.threshold, { ...this.context, ...context })
+    return new Logger(this.threshold, { ...this.context, ...context }, this.fields)
   }
 
   /**
@@ -180,9 +230,11 @@ export class Logger {
    *
    * @param event What happened, as a dotted event name.
    * @param data Structured detail.
+   * @param message A sentence for someone reading the stream. Defaults to the
+   *   event name.
    */
-  public debug(event: string, data?: Record<string, unknown>): void {
-    this.emit('debug', event, data)
+  public debug(event: string, data?: Record<string, unknown>, message?: string): void {
+    this.emit('debug', event, data, message)
   }
 
   /**
@@ -190,9 +242,11 @@ export class Logger {
    *
    * @param event What happened, as a dotted event name.
    * @param data Structured detail.
+   * @param message A sentence for someone reading the stream. Defaults to the
+   *   event name.
    */
-  public info(event: string, data?: Record<string, unknown>): void {
-    this.emit('info', event, data)
+  public info(event: string, data?: Record<string, unknown>, message?: string): void {
+    this.emit('info', event, data, message)
   }
 
   /**
@@ -200,9 +254,11 @@ export class Logger {
    *
    * @param event What happened, as a dotted event name.
    * @param data Structured detail.
+   * @param message A sentence for someone reading the stream. Defaults to the
+   *   event name.
    */
-  public warn(event: string, data?: Record<string, unknown>): void {
-    this.emit('warn', event, data)
+  public warn(event: string, data?: Record<string, unknown>, message?: string): void {
+    this.emit('warn', event, data, message)
   }
 
   /**
@@ -210,30 +266,39 @@ export class Logger {
    *
    * @param event What happened, as a dotted event name.
    * @param data Structured detail.
+   * @param message A sentence for someone reading the stream. Defaults to the
+   *   event name.
    */
-  public error(event: string, data?: Record<string, unknown>): void {
-    this.emit('error', event, data)
+  public error(event: string, data?: Record<string, unknown>, message?: string): void {
+    this.emit('error', event, data, message)
   }
 
   /**
    * Writes one line through the `console` method matching its level.
    *
+   * @remarks
+   * Context and payload are both flattened onto the line rather than nested,
+   * so a collector indexes `status` rather than `data.status` and a dashboard
+   * column reads as a field name instead of a path.
+   *
+   * They are not treated alike. Context is ambient — stamped by middleware for
+   * the span of a request — and passes through the allow-list, because a
+   * deployment should be able to decide it does not want the point of presence
+   * on every line. Payload was typed out at the call site for this one call,
+   * so it is emitted whole: filtering it would silently discard the answer
+   * someone went to the trouble of logging.
+   *
    * @param level Severity of the line.
    * @param event What happened, as a dotted event name.
    * @param data Structured detail.
+   * @param message A sentence for someone reading the stream.
    */
-  private emit(level: LogLevel, event: string, data?: Record<string, unknown>): void {
+  private emit(level: LogLevel, event: string, data?: Record<string, unknown>, message?: string): void {
     if (WEIGHT[level] < this.threshold) {
       return
     }
 
-    const line = JSON.stringify({
-      level,
-      event,
-      time: Time.nowIso(),
-      ...this.context,
-      ...(data ? { data: Logger.serialize(data) } : {})
-    })
+    const line = JSON.stringify(this.compose(level, event, data, message))
 
     switch (level) {
       case 'error':
@@ -248,6 +313,56 @@ export class Logger {
       default:
         console.info(line)
     }
+  }
+
+  /**
+   * Assembles the object that becomes the line.
+   *
+   * @remarks
+   * The three reserved keys are written first so a raw line reads
+   * level-then-event-then-message, and re-asserted on every merge so nothing
+   * can displace them. `time` sits behind the allow-list like any other field:
+   * a runtime that stamps its own ingestion timestamp does not need a second
+   * one, and it is computed here rather than carried in the context so it
+   * records when the line was written and not when the logger was built.
+   *
+   * @param level Severity of the line.
+   * @param event What happened, as a dotted event name.
+   * @param data Structured detail.
+   * @param message A sentence for someone reading the stream.
+   * @returns The line, ready to serialise.
+   */
+  private compose(
+    level: LogLevel,
+    event: string,
+    data?: Record<string, unknown>,
+    message?: string
+  ): Record<string, unknown> {
+    const line: Record<string, unknown> = {
+      level,
+      event,
+      message: message === undefined ? event : message
+    }
+
+    if (this.fields.permits('time')) {
+      line.time = Time.nowIso()
+    }
+
+    for (const [key, value] of Object.entries(this.context)) {
+      if (!RESERVED.has(key) && this.fields.permits(key)) {
+        line[key] = value
+      }
+    }
+
+    if (data) {
+      for (const [key, value] of Object.entries(Logger.serialize(data))) {
+        if (!RESERVED.has(key)) {
+          line[key] = value
+        }
+      }
+    }
+
+    return line
   }
 
   /**

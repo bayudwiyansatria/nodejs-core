@@ -1,6 +1,6 @@
 {
   "name": "@bayudwiyansatria/core",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "The vendor-neutral kernel: capability interfaces, configuration resolution, structured logging, and the service response contract",
   "keywords": [
     "typescript",

@@ -39,6 +39,20 @@ const SENSITIVE = [
 ]
 
 /**
+ * Key fragments that mark a value as a secret whatever type it arrives as.
+ *
+ * @remarks
+ * The rest of the list spares booleans, because a boolean cannot carry a
+ * credential. These cannot take that exemption: a card number, a CVV, a PIN and
+ * an OTP are all routinely held as numbers, and a numeric literal is exactly as
+ * damaging in a log stream as the same digits in quotes.
+ *
+ * Every entry here also appears in the list above; this one only says which of
+ * them ignore the type.
+ */
+const ALWAYS = ['cardnumber', 'cvv', 'cvc', 'pincode', 'otp', 'iban']
+
+/**
  * What replaces a redacted value.
  *
  * @remarks
@@ -71,6 +85,35 @@ const isSensitive = (key: string): boolean => {
 }
 
 /**
+ * Whether a field must be masked given both its name and what it holds.
+ *
+ * @remarks
+ * Name alone over-redacted in a way that defeated the point. An authentication
+ * failure logs `tokenPresented: false` and `apiKeyPresented: false` — the two
+ * facts that say *why* it failed — and a substring match on `token` and
+ * `apikey` masked both, leaving a line that recorded a failure and withheld its
+ * cause.
+ *
+ * A boolean is exempt because it cannot be a credential: there are two of them,
+ * and neither is a secret. Everything else keeps name-based masking, which
+ * stays predictable and errs towards over-redaction where the value could
+ * actually carry something.
+ *
+ * @param key The field name.
+ * @param value What the field holds.
+ * @returns True when the field must not reach the stream.
+ */
+const masks = (key: string, value: unknown): boolean => {
+  if (!isSensitive(key)) {
+    return false
+  }
+
+  const name = key.toLowerCase().replace(/[-_\s.]/g, '')
+
+  return typeof value !== 'boolean' || ALWAYS.some(fragment => name.includes(fragment))
+}
+
+/**
  * Replaces credential-looking fields in a structure with a redaction marker.
  *
  * @remarks
@@ -80,9 +123,14 @@ const isSensitive = (key: string): boolean => {
  * by people and a leaked key is not recoverable once it reaches a log stream.
  *
  * Matching is by field *name*: a value that happens to look like a token is
- * kept, and a field named like a secret is masked whatever it holds. Name-based
- * matching is predictable, which is what makes the result reviewable; guessing
- * at values would mask real data and still miss opaque secrets.
+ * kept, and a field named like a secret is masked. Name-based matching is
+ * predictable, which is what makes the result reviewable; guessing at values
+ * would mask real data and still miss opaque secrets.
+ *
+ * The one concession to type is booleans, which pass through. `tokenPresented:
+ * false` is not a credential — it is the reason an authentication failed, and
+ * masking it left lines that recorded a failure while withholding its cause.
+ * Names that routinely hold numeric secrets are exempt from that exemption.
  *
  * Arrays and nested objects are walked to a bounded depth. `Error` values are
  * left alone for `Logger` to expand, and every other non-object value is
@@ -99,7 +147,7 @@ const isSensitive = (key: string): boolean => {
  * @returns A copy with every sensitive field replaced by a marker.
  *
  * @author Bayu Dwiyan Satria
- * @version 1.2.0
+ * @version 1.2.1
  * @since 1.2.0
  */
 export function redact<T>(value: T, depth = 0): T {
@@ -118,7 +166,7 @@ export function redact<T>(value: T, depth = 0): T {
   const out: Record<string, unknown> = {}
 
   for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
-    out[key] = isSensitive(key) ? MASK : redact(entry, depth + 1)
+    out[key] = masks(key, entry) ? MASK : redact(entry, depth + 1)
   }
 
   return out as unknown as T

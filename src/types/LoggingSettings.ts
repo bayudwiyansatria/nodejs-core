@@ -33,4 +33,19 @@ export interface LoggingSettings {
    * sink.
    */
   service?: string
+
+  /**
+   * Which context fields reach the line.
+   *
+   * @remarks
+   * The **fallback**, below `LOG_FIELDS` in the environment and above the
+   * kernel's own default of every field. This is where an adapter narrows the
+   * line for a runtime it understands — one that records the service name or
+   * the point of presence itself has no use for a second copy — without the
+   * kernel having to know which runtime that is.
+   *
+   * Names the ambient fields only. What a caller passes to a single log call is
+   * always emitted.
+   */
+  fields?: string[]
 }

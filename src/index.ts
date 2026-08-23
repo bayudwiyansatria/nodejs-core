@@ -53,7 +53,7 @@
 /**
  * Core
  */
-export { configure, Logger, resolve, Service } from '@/core'
+export { configure, LogFields, Logger, resolve, Service } from '@/core'
 
 /**
  * Core — implementations that satisfy a capability without providing it

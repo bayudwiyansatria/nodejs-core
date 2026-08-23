@@ -184,10 +184,15 @@ describe('Logger', () => {
     expect(lineFrom('info').extra).toBeUndefined()
   })
 
-  it('nests structured data under a data key', () => {
+  /*
+   * Flat, not nested. A collector indexes what it is given, so `data.status`
+   * costs every query and every dashboard column a prefix that says nothing.
+   */
+  it('flattens structured data onto the line', () => {
     Logger.fromEnv({}).info('article.created', { id: 7 })
 
-    expect(lineFrom('info').data).toEqual({ id: 7 })
+    expect(lineFrom('info')).toMatchObject({ event: 'article.created', id: 7 })
+    expect(lineFrom('info').data).toBeUndefined()
   })
 
   /*
@@ -198,7 +203,7 @@ describe('Logger', () => {
   it('scrubs credential-shaped fields out of the payload', () => {
     Logger.fromEnv({}).info('external_api.request', { provider: 'telegram', apiKey: 'live-key' })
 
-    expect(lineFrom('info').data).toEqual({ provider: 'telegram', apiKey: '[redacted]' })
+    expect(lineFrom('info')).toMatchObject({ provider: 'telegram', apiKey: '[redacted]' })
   })
 
   /*
@@ -208,7 +213,7 @@ describe('Logger', () => {
   it('expands an Error in the payload to message and stack', () => {
     Logger.fromEnv({}).error('failed', { cause: new Error('boom') })
 
-    const { cause } = lineFrom('error').data
+    const { cause } = lineFrom('error')
 
     expect(cause.message).toBe('boom')
     expect(typeof cause.stack).toBe('string')
@@ -218,5 +223,152 @@ describe('Logger', () => {
     Logger.fromEnv({}).info('timed')
 
     expect(Number.isNaN(Date.parse(lineFrom('info').time))).toBe(false)
+  })
+
+  /*
+   * `event` names what happened for a query; `message` says it in English for
+   * whoever is reading. Most log viewers show only the latter, so it is never
+   * allowed to be empty — the event name stands in when nobody wrote one.
+   */
+  describe('message', () => {
+    it('falls back to the event name when none is given', () => {
+      Logger.fromEnv({}).info('notification.sent')
+
+      expect(lineFrom('info')).toMatchObject({
+        event: 'notification.sent',
+        message: 'notification.sent'
+      })
+    })
+
+    it('keeps the event name intact when a sentence is given', () => {
+      Logger.fromEnv({}).info('notification.sent', { provider: 'telegram' }, 'Notification sent via telegram')
+
+      expect(lineFrom('info')).toMatchObject({
+        event: 'notification.sent',
+        message: 'Notification sent via telegram',
+        provider: 'telegram'
+      })
+    })
+
+    it('emits a sentence with no payload', () => {
+      Logger.fromEnv({}).warn('request.completed', undefined, 'Request completed: GET / (404)')
+
+      expect(lineFrom('warn').message).toBe('Request completed: GET / (404)')
+    })
+  })
+
+  /*
+   * Both context and payload are merged onto the line, and either can arrive
+   * carrying a key the line already owns — a forwarded upstream record most
+   * of all, where `level` and `message` are exactly what its own fields are
+   * called. A payload that wins would file an error line as info, and a
+   * severity filter would never show it again.
+   */
+  describe('reserved keys', () => {
+    it.each(['level', 'event', 'message'])('does not let a payload overwrite %s', key => {
+      Logger.fromEnv({}).error('request.failed', { [key]: 'hijacked' })
+
+      expect(lineFrom('error')[key]).not.toBe('hijacked')
+    })
+
+    it('does not let context overwrite the level', () => {
+      Logger.fromEnv({}, { level: 'debug' }).error('request.failed')
+
+      expect(lineFrom('error').level).toBe('error')
+    })
+  })
+
+  /*
+   * The kernel narrows nothing on its own. Deciding a field is redundant means
+   * knowing what the runtime already records, which is an adapter's knowledge —
+   * so the default here admits everything and `LOG_FIELDS` does the narrowing.
+   */
+  describe('field selection', () => {
+    it('emits every context field by default', () => {
+      Logger.fromEnv({ SERVICE_NAME: 'mcp-server' }, { requestId: 'r1', colo: 'SIN' }).info('tagged')
+
+      expect(lineFrom('info')).toMatchObject({ service: 'mcp-server', requestId: 'r1', colo: 'SIN' })
+    })
+
+    it('keeps only the declared context fields', () => {
+      Logger.fromEnv(
+        { SERVICE_NAME: 'mcp-server', LOG_FIELDS: 'requestId,method' },
+        { requestId: 'r1', method: 'POST', colo: 'SIN' }
+      ).info('narrowed')
+
+      const line = lineFrom('info')
+
+      expect(line).toMatchObject({ requestId: 'r1', method: 'POST' })
+      expect(line.colo).toBeUndefined()
+      expect(line.service).toBeUndefined()
+    })
+
+    it('never filters the payload', () => {
+      Logger.fromEnv({ LOG_FIELDS: 'requestId' }, { colo: 'SIN' }).warn('authentication.failed', {
+        reason: 'api_key_absent'
+      })
+
+      expect(lineFrom('warn').reason).toBe('api_key_absent')
+    })
+
+    /*
+     * An empty declaration is a deployment saying the level, the event and the
+     * message are the whole line — not the same as leaving it unset, which is
+     * why it cannot fall through to the surface.
+     */
+    it('treats an empty declaration as no context at all', () => {
+      Logger.fromEnv({ SERVICE_NAME: 'mcp-server', LOG_FIELDS: '' }, { requestId: 'r1' }).info('bare')
+
+      const line = lineFrom('info')
+
+      expect(line).toMatchObject({ level: 'info', event: 'bare', message: 'bare' })
+      expect(line.requestId).toBeUndefined()
+      expect(line.service).toBeUndefined()
+    })
+
+    it('reads a star as every field', () => {
+      Logger.fromEnv({ LOG_FIELDS: '*' }, { requestId: 'r1', colo: 'SIN' }).info('everything')
+
+      expect(lineFrom('info')).toMatchObject({ requestId: 'r1', colo: 'SIN' })
+    })
+
+    it('tolerates spacing in the declaration', () => {
+      Logger.fromEnv({ LOG_FIELDS: ' requestId , method ' }, { requestId: 'r1', method: 'GET' }).info('spaced')
+
+      expect(lineFrom('info')).toMatchObject({ requestId: 'r1', method: 'GET' })
+    })
+
+    it('takes the declaration from the configured surface', () => {
+      configure(systemDefaults, { logging: { fields: ['requestId'] } })
+
+      Logger.fromEnv({}, { requestId: 'r1', colo: 'SIN' }).info('from surface')
+
+      expect(lineFrom('info').requestId).toBe('r1')
+      expect(lineFrom('info').colo).toBeUndefined()
+    })
+
+    it('prefers the environment over the configured surface', () => {
+      configure(systemDefaults, { logging: { fields: ['requestId'] } })
+
+      Logger.fromEnv({ LOG_FIELDS: 'colo' }, { requestId: 'r1', colo: 'SIN' }).info('env wins')
+
+      expect(lineFrom('info').colo).toBe('SIN')
+      expect(lineFrom('info').requestId).toBeUndefined()
+    })
+
+    it('drops the timestamp when it is not declared', () => {
+      Logger.fromEnv({ LOG_FIELDS: 'requestId' }, { requestId: 'r1' }).info('untimed')
+
+      expect(lineFrom('info').time).toBeUndefined()
+    })
+
+    it('carries the declaration into a child', () => {
+      const log = Logger.fromEnv({ LOG_FIELDS: 'requestId' }, { requestId: 'r1' })
+
+      log.child({ colo: 'SIN' }).info('derived')
+
+      expect(lineFrom('info').requestId).toBe('r1')
+      expect(lineFrom('info').colo).toBeUndefined()
+    })
   })
 })

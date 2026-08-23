@@ -10,7 +10,7 @@
  * - {@link Service} — the base a business service extends, and the `ok()` /
  *   `fail()` builders it gets from doing so.
  * - {@link Logger} — structured, level-classified lines to the runtime's log
- *   stream.
+ *   stream, and {@link LogFields}, which decides how much of one is ingested.
  * - {@link configure} and {@link resolve} — the configuration engine.
  * - [`noop/`](./noop/index.ts) — implementations that satisfy a capability
  *   without providing it.
@@ -56,6 +56,7 @@
  */
 export { Service } from '@/core/Service'
 export { Logger } from '@/core/Logger'
+export { LogFields } from '@/core/LogFields'
 export { configure } from '@/core/configure'
 export { resolve } from '@/core/resolve'
 

@@ -45,6 +45,46 @@ describe('redact', () => {
   })
 
   /*
+   * Found in production: every field on an `authentication.failed` line was
+   * masked, including the booleans saying *why* it failed. The line recorded a
+   * failure and withheld its cause. A boolean cannot be a credential — there
+   * are two of them, and neither is a secret.
+   */
+  describe('booleans', () => {
+    it('keeps the booleans that explain an authentication failure', () => {
+      const line = {
+        verificationConfigured: true,
+        tokenPresented: false,
+        fixedTokenConfigured: true,
+        apiKeyPresented: false
+      }
+
+      expect(redact(line)).toEqual(line)
+    })
+
+    it('still masks the credential itself on the same line', () => {
+      expect(redact({ tokenPresented: true, token: 'live-token' })).toEqual({
+        tokenPresented: true,
+        token: '[redacted]'
+      })
+    })
+
+    /*
+     * The exemption has its own exemption. A card number, a CVV, a PIN and an
+     * OTP are routinely numbers, and digits in a log stream are as damaging
+     * unquoted as quoted — so those names ignore the type entirely.
+     */
+    it.each(['cardNumber', 'cvv', 'cvc', 'pinCode', 'otp', 'iban'])('masks %s whatever type it arrives as', key => {
+      expect(redact({ [key]: 4111111111111111 })[key]).toBe('[redacted]')
+      expect(redact({ [key]: true })[key]).toBe('[redacted]')
+    })
+
+    it('masks a credential-named number that is not one of those', () => {
+      expect(redact({ apiKey: 12345 })).toEqual({ apiKey: '[redacted]' })
+    })
+  })
+
+  /*
    * Name-based matching, not value-based. A token-shaped string under an
    * innocent name is kept, because guessing at values would mask real data and
    * still miss anything opaque.
