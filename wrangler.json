@@ -1,18 +1,19 @@
 {
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
   "name": "nodejs-core",
   "pages_build_output_dir": "dist",
-  "compatibility_date": "2026-08-07",
+  "compatibility_date": "2026-08-28",
   "compatibility_flags": [],
   "vars": {},
   "kv_namespaces": [],
+  "analytics_engine_datasets": [],
   "d1_databases": [],
   "r2_buckets": [],
-  "analytics_engine_datasets": [],
-  "vectorize": [],
-  "hyperdrive": [],
   "queues": {
     "producers": []
   },
+  "vectorize": [],
+  "hyperdrive": [],
   "durable_objects": {
     "bindings": []
   }
