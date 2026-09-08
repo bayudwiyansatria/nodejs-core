@@ -4,11 +4,13 @@
  * Framework utilities — pure helpers this package itself depends on.
  *
  * @remarks
- * These are published because the kernel needs them, not because they aim to be
- * a general-purpose utility belt. `Text` shortens a telemetry sampling key,
- * `Time` stamps every log line and measures every request, and `Signature` signs
- * a value that has to travel somewhere the process does not control. Application
- * code may use them too, through the package barrel.
+ * These are narrow on purpose: this is not a general-purpose utility belt. `Text`
+ * shortens a telemetry sampling key and `Time` stamps every log line, both for the
+ * kernel itself; `Signature` signs a value that has to travel somewhere the process
+ * does not control, and `List` partitions a batch against a ceiling the caller
+ * knows. The last two the kernel does not call — they are here because a helper
+ * that is pure, vendor-neutral and already written twice in two consumers is a
+ * helper those consumers should share rather than keep diverging copies of.
  *
  * An application's *own* helpers — the ones encoding decisions about its input
  * and its domain — belong in that application, not here. The one-way rule is the
@@ -34,6 +36,7 @@
  * @version 1.0.0
  * @since 1.0.0
  */
+export { List } from '@/utils/List'
 export { Signature } from '@/utils/Signature'
 export { Text } from '@/utils/Text'
 export { Time } from '@/utils/Time'

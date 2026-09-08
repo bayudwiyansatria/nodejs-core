@@ -19,13 +19,21 @@ on:
         default: 1
 jobs:
   #---------------------------------------------------------------------------------------------------------------------
+  # Code Analysis: Secret Detection
+  #---------------------------------------------------------------------------------------------------------------------
+  secret-detection:
+    name: Secret Detection
+    uses: bayudwiyansatria/.github/.github/workflows/code-analysis-secret.yml@master
+  #---------------------------------------------------------------------------------------------------------------------
   # Build
   #---------------------------------------------------------------------------------------------------------------------
   build:
     name: Build
+    needs:
+      - secret-detection
     uses: bayudwiyansatria/.github/.github/workflows/build-node-npm.yml@master
     with:
-      NODE_VERSION: 21
+      NODE_VERSION: 22
       ARTIFACT_NAME: lib
       ARTIFACT_PATH: lib
     secrets:
@@ -39,7 +47,7 @@ jobs:
       - build
     uses: bayudwiyansatria/.github/.github/workflows/build-node-docs.yml@master
     with:
-      NODE_VERSION: 21
+      NODE_VERSION: 22
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
   #---------------------------------------------------------------------------------------------------------------------
@@ -51,11 +59,24 @@ jobs:
       - build
     uses: bayudwiyansatria/.github/.github/workflows/test-node-npm.yml@master
     with:
-      NODE_VERSION: 21
+      NODE_VERSION: 22
       BUILD_ARTIFACT_NAME: lib
       BUILD_ARTIFACT_PATH: lib
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Code Analysis: Coverage
+  #---------------------------------------------------------------------------------------------------------------------
+  code-quality:
+    name: Code Quality
+    needs:
+      - test
+    uses: bayudwiyansatria/.github/.github/workflows/code-analysis-codecov.yml@master
+    with:
+      ARTIFACT_NAME: coverage
+      ARTIFACT_PATH: dist/coverage
+    secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   #---------------------------------------------------------------------------------------------------------------------
   # Publish
@@ -65,22 +86,25 @@ jobs:
     name: Publish
     needs:
       - build
-      - docs
       - test
+      - docs
+      - secret-detection
+      - code-quality
     uses: bayudwiyansatria/.github/.github/workflows/deploy-node-npm.yml@master
     with:
       MAJOR_VERSION: ${{ inputs.MAJOR_VERSION }}
       MINOR_VERSION: ${{ inputs.MINOR_VERSION }}
       INCREMENTAL_VERSION: ${{ inputs.INCREMENTAL_VERSION }}
-      NODE_VERSION: 21
+      NODE_VERSION: 22
       ARTIFACT_NAME: lib
       ARTIFACT_PATH: lib
+      NODE_COMMAND: npm run release
       NPM_REGISTRY: https://npm.pkg.github.com
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
   #---------------------------------------------------------------------------------------------------------------------
-  # Publish
+  # Release
   #---------------------------------------------------------------------------------------------------------------------
   release:
     if: ${{ github.event_name == 'workflow_dispatch' }}

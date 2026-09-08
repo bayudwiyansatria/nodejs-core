@@ -5,13 +5,21 @@ on:
       - master
 jobs:
   #---------------------------------------------------------------------------------------------------------------------
+  # Code Analysis: Secret Detection
+  #---------------------------------------------------------------------------------------------------------------------
+  secret-detection:
+    name: Secret Detection
+    uses: bayudwiyansatria/.github/.github/workflows/code-analysis-secret.yml@master
+  #---------------------------------------------------------------------------------------------------------------------
   # Build
   #---------------------------------------------------------------------------------------------------------------------
   build:
     name: Build
+    needs:
+      - secret-detection
     uses: bayudwiyansatria/.github/.github/workflows/build-node-npm.yml@master
     with:
-      NODE_VERSION: 21
+      NODE_VERSION: 22
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
   #---------------------------------------------------------------------------------------------------------------------
@@ -23,7 +31,7 @@ jobs:
       - build
     uses: bayudwiyansatria/.github/.github/workflows/build-node-docs.yml@master
     with:
-      NODE_VERSION: 21
+      NODE_VERSION: 22
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
   #---------------------------------------------------------------------------------------------------------------------
@@ -35,17 +43,20 @@ jobs:
       - build
     uses: bayudwiyansatria/.github/.github/workflows/test-node-npm.yml@master
     with:
-      NODE_VERSION: 21
+      NODE_VERSION: 22
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   #---------------------------------------------------------------------------------------------------------------------
-  # Code Analysis
+  # Code Analysis: Coverage
   #---------------------------------------------------------------------------------------------------------------------
-  code-analysis:
-    name: Code Analysis
+  code-quality:
+    name: Code Quality
     needs:
       - test
     uses: bayudwiyansatria/.github/.github/workflows/code-analysis-codecov.yml@master
+    with:
+      ARTIFACT_NAME: coverage
+      ARTIFACT_PATH: dist/coverage
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

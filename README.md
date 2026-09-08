@@ -32,7 +32,7 @@ declaration artifacts under `lib/`.
 | Observability | `Logger`, `LogFields`, `LogContext`, `LogLevel`, `LoggingSettings`                           |
 | Security      | `redact`, `timingSafeEqual`                                                                  |
 | Errors        | `MissingCapabilityError`, `ConfigurationError`                                               |
-| Utilities     | `Signature`, `Text`, `Time`                                                                  |
+| Utilities     | `List`, `Signature`, `Text`, `Time`                                                          |
 
 Tooling and project baseline:
 
@@ -176,6 +176,7 @@ anything, which is useful in tests and in deployments where the capability is no
 
 ### Utilities
 
+- `List.chunk(values, size)` to split a list into runs of at most `size`, for a batch with a ceiling downstream
 - `Signature.sign(secret, scope, value)` and `Signature.verify(...)` for stateless tokens over HMAC-SHA-256
 - `Text.truncate`, `Text.trim`, `Text.isBlank`
 - `Time.now`, `Time.nowIso`, `Time.since`
@@ -194,7 +195,7 @@ src/
   constants/            systemDefaults
   exceptions/           MissingCapabilityError, ConfigurationError
   security/             redact, timingSafeEqual
-  utils/                Signature, Text, Time
+  utils/                List, Signature, Text, Time
 test/                   Jest specs (*.spec.ts) mirroring src/
 docs/                   Documentation and release history
   reference/            Reference guides
