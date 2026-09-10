@@ -5,15 +5,20 @@ All notable changes to this project will be documented in this file.
 See detailed changes in [docs/changes-log/](docs/changes-log/) for each work session, and
 [docs/release-notes/](docs/release-notes/) for each release.
 
-## [1.3.0] - 2026-09-05
+## [1.3.0] - 2026-09-11
 
-One helper, promoted from two consumers that had written it separately and disagreed at the boundary. See the
-[changes log](docs/changes-log/2026-09-05.md).
+Two helpers, each promoted from consumers that had written it separately — one of which had already disagreed at the
+boundary. See the changes logs for [2026-09-05](docs/changes-log/2026-09-05.md) and
+[2026-09-11](docs/changes-log/2026-09-11.md).
 
 ### Added
 
 - **`List`** — array helpers for the case where a batch has a ceiling the caller knows and the callee does not.
   `List.chunk(values, size)` splits a list into consecutive runs of at most `size`
+- **`Json`** — JSON helpers for untrusted input. `Json.parse<T>(text)` answers a value or `null` instead of throwing, so
+  a route reading a body decides its status code in one line rather than wrapping every read in a `try`/`catch`. `null`
+  covers malformed syntax, an empty body, and a bare `null` literal alike; a falsy primitive that is still a value (`0`,
+  `false`) comes back intact. It was identical in two consumers, differing only in its example
 - **A defined behaviour for an unusable `size`.** Two private copies of this function were in production and disagreed
   exactly here: one clamped the step to `1`, the other returned the whole input as a single run. `List.chunk` clamps.
   Returning one unbounded run breaks the only promise the function makes, and breaks it toward the failure — the caller

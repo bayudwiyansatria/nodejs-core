@@ -8,6 +8,7 @@
 
 ## Release Information
 
+- [1.3.0 — Two helpers that were already written twice](release-notes/1.3.0.md)
 - [1.2.1 — A flat line, a readable message, and a field list](release-notes/1.2.1.md)
 - [1.2.0 — `event`, not `message`, and a redaction pass](release-notes/1.2.0.md)
 - [1.1.0 — Outbound delivery is configurable](release-notes/1.1.0.md)
@@ -15,6 +16,8 @@
 
 ## Changes Log
 
+- [2026-09-11 — Three more candidates, one survivor](changes-log/2026-09-11.md)
+- [2026-09-05 — One `chunk`, from two that disagreed](changes-log/2026-09-05.md)
 - [2026-08-24 — What the log lines actually looked like](changes-log/2026-08-24.md)
 - [2026-08-23 — `Logger` stops restating what the runtime knows](changes-log/2026-08-23.md)
 - [2026-08-20 — One release-notes format across the family](changes-log/2026-08-20.md)

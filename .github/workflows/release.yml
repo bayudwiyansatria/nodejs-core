@@ -98,7 +98,6 @@ jobs:
       NODE_VERSION: 22
       ARTIFACT_NAME: lib
       ARTIFACT_PATH: lib
-      NODE_COMMAND: npm run release
       NPM_REGISTRY: https://npm.pkg.github.com
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

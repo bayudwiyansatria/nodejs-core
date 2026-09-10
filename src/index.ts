@@ -78,7 +78,7 @@ export { redact, timingSafeEqual } from '@/security'
 /**
  * Utilities
  */
-export { List, Signature, Text, Time } from '@/utils'
+export { Json, List, Signature, Text, Time } from '@/utils'
 
 /**
  * Types
