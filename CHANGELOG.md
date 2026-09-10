@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 See detailed changes in [docs/changes-log/](docs/changes-log/) for each work session, and
 [docs/release-notes/](docs/release-notes/) for each release.
 
+## [1.3.0] - 2026-09-05
+
+One helper, promoted from two consumers that had written it separately and disagreed at the boundary. See the
+[changes log](docs/changes-log/2026-09-05.md).
+
+### Added
+
+- **`List`** — array helpers for the case where a batch has a ceiling the caller knows and the callee does not.
+  `List.chunk(values, size)` splits a list into consecutive runs of at most `size`
+- **A defined behaviour for an unusable `size`.** Two private copies of this function were in production and disagreed
+  exactly here: one clamped the step to `1`, the other returned the whole input as a single run. `List.chunk` clamps.
+  Returning one unbounded run breaks the only promise the function makes, and breaks it toward the failure — the caller
+  asked for a bounded batch because something downstream has a limit. Anything that is not a finite number of one or
+  more is treated as one, `NaN` included, since a size read from a missing environment variable arrives that way
+
+### Changed
+
+- **The note on `utils/` no longer claims the kernel needs everything in it.** It did not: nothing in `src/` calls
+  `Signature` either. Published helpers are the pure, vendor-neutral ones, whether or not the kernel itself calls them
+
 ## [1.2.1] - 2026-08-24
 
 What 330 production log records showed about the lines 1.2.0 produces: half of every line was a field paid for twice,
