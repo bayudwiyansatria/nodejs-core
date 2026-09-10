@@ -16,7 +16,7 @@
 
 ## Changes Log
 
-- [2026-09-11 — Three more candidates, one survivor](changes-log/2026-09-11.md)
+- [2026-09-11 — One utility survivor and a publication-ready repository](changes-log/2026-09-11.md)
 - [2026-09-05 — One `chunk`, from two that disagreed](changes-log/2026-09-05.md)
 - [2026-08-24 — What the log lines actually looked like](changes-log/2026-08-24.md)
 - [2026-08-23 — `Logger` stops restating what the runtime knows](changes-log/2026-08-23.md)

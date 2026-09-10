@@ -22,4 +22,5 @@ Dated engineering change log (`YYYY-MM-DD.md`) — a more granular, chronologica
 ---
 
 Historical docs (`release-notes/`, `changes-log/`) are point-in-time records and are not updated retroactively when the
-codebase moves on. `reference/` is a living doc — if you change the behavior it describes, update it in the same change.
+codebase moves on, except to correct formatting, links, or factual errors. `reference/` is a living doc — if you change
+the behavior it describes, update it in the same change.

@@ -59,7 +59,7 @@
     "build:docs:book": "honkit build docs ../dist/book",
     "docker:build:docs": "docker compose -f docker/docker-compose.docs.yaml build --no-cache",
     "docker:serve:docs": "docker compose -f docker/docker-compose.docs.yaml up",
-    "format": "prettier --write '*.{json,js}' 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
+    "format": "prettier --write '*.{json,js}' '**/*.md' 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
     "lint": "npm run lint:run",
     "lint:run": "eslint src",
     "lint:fix": "eslint src --fix",

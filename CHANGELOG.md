@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 See detailed changes in [docs/changes-log/](docs/changes-log/) for each work session, and
 [docs/release-notes/](docs/release-notes/) for each release.
 
+The format follows [Keep a Changelog](https://keepachangelog.com/), and releases follow
+[Semantic Versioning](https://semver.org/).
+
+## [Unreleased]
+
+### Documentation
+
+- Corrected stale support, release-note, and changes-log links before public repository publication
+- Documented GitHub Packages authentication and the Node.js 22 development baseline
+- Expanded the contributing and security policies and improved issue and pull request templates
+- Updated the configuration reference and replaced the obsolete template-oriented agent guide
+
 ## [1.3.0] - 2026-09-11
 
 Two helpers, each promoted from consumers that had written it separately — one of which had already disagreed at the
@@ -97,16 +109,6 @@ things it was restating. See the [release notes](docs/release-notes/1.2.0.md).
 - **`Logger` runs every payload through `redact`** before serialising. Redaction first, then `Error` expansion — the
   order matters, because redaction leaves errors alone precisely so the second pass can recognise them
 
-## [Unreleased]
-
-### Changed
-
-- **Release notes rewritten to the family's section skeleton** — `# Release Notes` / `## Version <x.y.z>` with the emoji
-  sections, adopted from `@bayudwiyansatria/auth-client`. Documentation only; no prose was cut and no source,
-  configuration, or exported symbol changed
-- **The `1.1.0` section of this file, previously missing**, written up from `docs/release-notes/1.1.0.md` and
-  `docs/changes-log/2026-08-08.md`
-
 ## [1.1.0] - 2026-08-08
 
 One addition. An application can now say how hard it tries when it posts to a service it does not control, through the
@@ -179,3 +181,10 @@ whose placeholder source was removed.
 - 85 specs across nine suites; statement coverage 99.45%
 
 See [docs/release-notes/1.0.0.md](docs/release-notes/1.0.0.md) for full release details.
+
+[Unreleased]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.3.0...HEAD
+[1.3.0]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.2.1...1.3.0
+[1.2.1]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.2.0...1.2.1
+[1.2.0]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.1.0...1.2.0
+[1.1.0]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.0.0...1.1.0
+[1.0.0]: https://github.com/bayudwiyansatria/nodejs-core/releases/tag/1.0.0

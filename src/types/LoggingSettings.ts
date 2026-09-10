@@ -28,9 +28,8 @@ export interface LoggingSettings {
    * constant in a separate source file can. This is what a runtime with no
    * environment to read falls back to.
    *
-   * Optional: with neither set, a line carries no `service` at all — right for
-   * a process whose stream carries nothing else, wrong for anything sharing a
-   * sink.
+   * Optional: with neither set, {@link Logger.fromEnv} records `unknown`. That
+   * visible sentinel lets a deployment find and correct missing service names.
    */
   service?: string
 

@@ -36,13 +36,12 @@
  *
  * ```ts
  * import { configure, Logger, systemDefaults } from '@bayudwiyansatria/core'
- * import { platformDefaults } from '<the-adapter-package>'
  *
  * // Once, at startup, before anything resolves a setting.
- * configure({ ...systemDefaults, ...platformDefaults }, overrides)
+ * configure(systemDefaults)
  *
- * const log = Logger.fromEnv(env, { service: 'ArticleService' })
- * log.info('ready')
+ * const log = Logger.fromEnv({ SERVICE_NAME: 'article-api' }, { component: 'ArticleService' })
+ * log.info('service.started')
  * ```
  *
  * @author Bayu Dwiyan Satria

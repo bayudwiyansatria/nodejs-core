@@ -6,14 +6,14 @@
 [![License](https://img.shields.io/github/license/bayudwiyansatria/nodejs-core)](LICENSE)
 [![Version](https://img.shields.io/github/package-json/v/bayudwiyansatria/nodejs-core)](package.json)
 
-The vendor-neutral kernel shared by my Node/TypeScript services: capability interfaces, configuration resolution,
-structured logging, and the service response contract.
+A vendor-neutral kernel for Node.js and TypeScript services: capability interfaces, configuration resolution, structured
+logging, security utilities, and a consistent service response contract.
 
 ## Overview
 
-This package is the bottom layer everything else depends on. It provides four things: interfaces describing what an
-application needs from its platform, a configuration engine that merges defaults with overrides, a structured logger,
-and an abstract `Service` base that fixes the response shape.
+This package is a foundation layer for services that share the same architecture. Its primary responsibilities are
+platform capability contracts, configuration resolution, structured logging, security and general-purpose utilities, and
+an abstract `Service` base that fixes the response shape.
 
 It has no runtime dependencies and names no vendor, no runtime, and no HTTP framework. A cache is described by the
 `CacheStore` interface; which cache you actually get is decided by a separate adapter package. Applications import the
@@ -32,7 +32,7 @@ declaration artifacts under `lib/`.
 | Observability | `Logger`, `LogFields`, `LogContext`, `LogLevel`, `LoggingSettings`                           |
 | Security      | `redact`, `timingSafeEqual`                                                                  |
 | Errors        | `MissingCapabilityError`, `ConfigurationError`                                               |
-| Utilities     | `List`, `Signature`, `Text`, `Time`                                                          |
+| Utilities     | `Json`, `List`, `Signature`, `Text`, `Time`                                                  |
 
 Tooling and project baseline:
 
@@ -48,28 +48,46 @@ Tooling and project baseline:
 
 ## Install
 
+### Requirements
+
+- Node.js 22 and npm for development and for the workflows documented in this repository
+- A GitHub personal access token (classic) with `read:packages` permission for GitHub Packages
+
+Authenticate to GitHub Packages. Use your GitHub username when prompted and the personal access token as the password:
+
+```bash
+npm login --scope=@bayudwiyansatria --auth-type=legacy --registry=https://npm.pkg.github.com
+```
+
+Then map this package scope to GitHub Packages in the consuming project's `.npmrc`:
+
+```text
+@bayudwiyansatria:registry=https://npm.pkg.github.com
+```
+
+Never commit a personal access token to the repository. CI should provide its token through a secret such as
+`NPM_AUTH_TOKEN`.
+
+Install the package:
+
 ```bash
 npm install @bayudwiyansatria/core
-```
-
-The package publishes to the GitHub npm registry, so `.npmrc` needs:
-
-```
-@bayudwiyansatria:registry=https://npm.pkg.github.com
 ```
 
 ## Quick Start
 
 ```ts
 import { configure, Logger, systemDefaults } from '@bayudwiyansatria/core'
-import { platformDefaults } from '<the-adapter-package>'
 
 // Once, at startup, before anything reads a setting.
-configure({ ...systemDefaults, ...platformDefaults }, { logging: { service: 'article-api' } })
+configure(systemDefaults)
 
-const log = Logger.fromEnv(env, { component: 'ArticleService' })
+const log = Logger.fromEnv({ SERVICE_NAME: 'article-api' }, { component: 'ArticleService' })
 log.info('service.started')
 ```
+
+Applications that use a platform adapter merge that adapter's defaults with `systemDefaults` before calling
+`configure()`.
 
 ## Usage
 
@@ -103,12 +121,12 @@ are `debug`, `info`, `warn`, `error`.
 ```ts
 import { Logger } from '@bayudwiyansatria/core'
 
-const log = Logger.fromEnv(env, { component: 'ArticleService' })
+const log = Logger.fromEnv({ SERVICE_NAME: 'article-api' }, { component: 'ArticleService' })
 
 log.info('article.created', { id: 42 })
-log.error('external_api.error', { status: 502 }, `Upstream returned ${status}`)
+log.error('external_api.error', { status: 502 }, 'Upstream returned 502')
 
-const scoped = log.child({ requestId }) // inherits context, adds its own
+const scoped = log.child({ requestId: 'req-123' }) // inherits context, adds its own
 ```
 
 Three arguments, and each answers a different question:
@@ -176,6 +194,7 @@ anything, which is useful in tests and in deployments where the capability is no
 
 ### Utilities
 
+- `Json.parse<T>(text)` to parse untrusted JSON without throwing
 - `List.chunk(values, size)` to split a list into runs of at most `size`, for a batch with a ceiling downstream
 - `Signature.sign(secret, scope, value)` and `Signature.verify(...)` for stateless tokens over HMAC-SHA-256
 - `Text.truncate`, `Text.trim`, `Text.isBlank`
@@ -264,8 +283,10 @@ rather than trusting the bundler config.
 
 ## Development
 
+Development and CI use Node.js 22. The generated bundles target ES2020.
+
 ```bash
-npm install
+npm ci
 npm test           # lint + jest
 npm run build      # four artifacts under lib/
 npm run build:docs
@@ -286,8 +307,8 @@ cut manually through the Release Dispatch workflow.
 - [Summary](docs/SUMMARY.md)
 - [Configuration Reference](docs/reference/configuration.md) — `configure`, `resolve`, merge semantics, and the ordering
   constraint
-- [Latest Release Notes](docs/release-notes/1.0.0.md)
-- [Changes Log](docs/changes-log/2026-08-07.md)
+- [Latest Release Notes](docs/release-notes/1.3.0.md)
+- [Latest Changes Log](docs/changes-log/2026-09-11.md)
 - [API Reference](https://bayudwiyansatria.github.io/nodejs-core) — generated from source
 
 ### Docs Site

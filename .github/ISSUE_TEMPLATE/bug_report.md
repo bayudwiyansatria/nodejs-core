@@ -1,29 +1,53 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
+about: Report a reproducible problem with the package
+title: '[Bug]: '
+labels: 'bug'
 assignees: ''
 ---
 
-**Describe the bug** A clear and concise description of what the bug is.
+## Description
 
-**To Reproduce** Steps to reproduce the behavior:
+<!-- Clearly describe the problem and its impact. -->
 
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## Minimal Reproduction
 
-**Expected behavior** A clear and concise description of what you expected to happen.
+<!-- Provide the smallest code sample or repository that reproduces the problem. Remove credentials and private data. -->
 
-**Environment**
+```ts
+// Reproduction code
+```
 
+## Steps to Reproduce
+
+1.
+2.
+3.
+
+## Expected Behavior
+
+<!-- What should have happened? -->
+
+## Actual Behavior
+
+<!-- What happened instead? Include the exact error when applicable. -->
+
+## Environment
+
+- Package version:
 - Node.js version:
 - npm version:
-- OS:
-- Package version:
+- Operating system:
+- Module format: ESM / CommonJS / UMD
 
-**Logs / stack trace** If available, paste relevant logs or error output.
+## Logs or Stack Trace
 
-**Additional context** Add any other context about the problem here.
+<!-- Paste only the relevant output. Use a fenced code block and remove sensitive information. -->
+
+```text
+Relevant output
+```
+
+## Additional Context
+
+<!-- Add any other details that may help diagnose the problem. -->

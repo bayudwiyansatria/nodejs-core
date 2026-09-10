@@ -1,56 +1,40 @@
-<!--
-Please label this PR with one of the following labels:
-Bug, Enhancement, Breaking change, Deprecation, Cleanup, Docs
--->
+## Summary
 
-## What does this PR do?
+<!-- Explain what changed. Keep the pull request focused on one concern. -->
 
-<!-- Mandatory: Explain the main change and scope. -->
+## Motivation
 
-## Why is it important?
+<!-- Explain the problem, the intended outcome, and why this belongs in the vendor-neutral core package. -->
 
-<!-- Mandatory: Explain motivation and impact. -->
+## Changes
 
-## Checklist
-
-<!-- Mandatory: Verify items before requesting review. -->
-
-- [ ] My code follows the style guidelines of this project
-- [ ] I have added concise comments where code is not self-explanatory
-- [ ] I have made corresponding changes to the documentation
-- [ ] I have updated configuration defaults when needed
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] I have added an entry in `docs/changes-log/` using format `YYYY-MM-DD.md`
-
-## Author's Checklist
-
-<!-- Recommended: Add project-specific checks if needed. -->
-
-- [ ]
-
-## How to test this PR locally
-
-<!-- Recommended: Add commands and expected result. -->
-
-## Related issues
-
-<!-- Recommended examples:
-Closes #123
-Relates #123
-Requires #123
-Supersedes #123
--->
+<!-- List the important implementation, test, configuration, and documentation changes. -->
 
 -
 
-## Use cases
+## Compatibility
 
-<!-- Recommended: Describe behavior changes and usage scenarios. -->
+<!-- Describe public API, runtime, configuration, logging, or packaging impact. Write "None" when there is no impact. -->
 
-## Screenshots
+## Verification
 
-<!-- Optional: Add screenshots for UI or output changes. -->
+<!-- List commands run and any relevant manual checks. -->
 
-## Logs
+```text
+npm test
+npm run build
+npm run build:docs
+```
 
-<!-- Recommended: Paste important logs, stack traces, or command output. -->
+## Related Issues
+
+<!-- Use "Closes #123" for an issue this pull request resolves, or "Relates to #123" for context. -->
+
+## Checklist
+
+- [ ] The change follows the project's TypeScript and layering conventions.
+- [ ] Tests cover new or changed behavior.
+- [ ] Public API and behavior changes are documented.
+- [ ] Notable changes are recorded in `docs/changes-log/` and under `[Unreleased]` in `CHANGELOG.md`.
+- [ ] Generated `lib/` and `dist/` output is not committed.
+- [ ] No credentials, tokens, personal data, or sensitive logs are included.

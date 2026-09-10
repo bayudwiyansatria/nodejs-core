@@ -25,8 +25,8 @@ import { platformDefaults } from '<the-adapter-package>'
 configure({ ...systemDefaults, ...platformDefaults }, overrides)
 ```
 
-A flat merge is safe because the halves share no key: this package owns `logging` and `security`, the adapter owns the
-binding-backed modules.
+A flat merge is safe because the halves share no key: this package owns `delivery`, `logging`, and `security`; the
+adapter owns the binding-backed modules.
 
 That inversion is what makes the kernel extractable. Before it, `resolve()` imported the application's configuration
 directly — fine inside one repository, impossible across a package boundary.
@@ -52,8 +52,8 @@ configure({ cache: { driver: 'memory', ttl: 300 } }, { cache: { ttl: 60 } })
 resolve('cache') // { driver: 'memory', ttl: 60 }
 ```
 
-An override that names only `ttl` keeps the default `driver`, so a partial override never silently blanks the
-rest of a module.
+An override that names only `ttl` keeps the default `driver`, so a partial override never silently blanks the rest of a
+module.
 
 An override field set explicitly to `undefined` is **ignored**, for the same reason — writing `{ model: undefined }` is
 how a caller says "no opinion", not "erase it".
@@ -79,7 +79,7 @@ configure(...) // runs after both modules have fully initialised
 Nothing an application writes can make a statement run before its own imports. Two consequences:
 
 **For adapter authors.** Never call `resolve()` at module scope or in a constructor. Adapters create accessors at module
-scope so one instance is reused across requests, and if that resolved settings, the *import statement* would throw.
+scope so one instance is reused across requests, and if that resolved settings, the _import statement_ would throw.
 Defer to first use instead, with a memoised getter that calls `resolve()` the first time a setting is read.
 
 **For application authors.** Put the `configure()` call in your configuration module and have anything that reads
@@ -92,7 +92,7 @@ configure(defaults, overrides)
 
 ```ts
 // src/app.ts
-import 'config' // must come first
+import './config' // must come first
 ```
 
 A module is always fully evaluated before its importers, so naming the dependency makes the module graph enforce the

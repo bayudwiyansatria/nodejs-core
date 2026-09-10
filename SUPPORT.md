@@ -1,12 +1,21 @@
-# How To Get Support For Project
+# Support
 
-For help, support, questions, and ideas, please use one of the channels below.
+Start with the [README](README.md) and the documentation under [`docs/`](docs/). The generated API reference is
+available at <https://bayudwiyansatria.github.io/nodejs-core> after the documentation site has been deployed.
 
-- Email: bayudwiyansatria@gmail.com
-- GitHub Issues: https://github.com/bayudwiyansatria/templates-project-nodejs/issues
+## Questions and problem reports
 
-Documentation is available in this repository under `docs/` and at:
+Use [GitHub Issues](https://github.com/bayudwiyansatria/nodejs-core/issues) for reproducible bugs, documentation
+problems, and feature requests. Before opening an issue:
 
-- https://bayudwiyansatria.github.io/templates-project-nodejs
+- Search existing issues for the same problem.
+- Confirm the problem occurs with the latest supported release.
+- Include the package, Node.js, npm, and operating-system versions.
+- Provide a minimal reproduction, expected behavior, actual behavior, and relevant logs.
 
-Please include clear context, expected behavior, and reproduction steps in requests.
+For questions that are not suitable for an issue, email [bayudwiyansatria@gmail.com](mailto:bayudwiyansatria@gmail.com).
+
+## Security vulnerabilities
+
+Do not report vulnerabilities in a public issue. Follow the private reporting instructions in
+[SECURITY.md](SECURITY.md).

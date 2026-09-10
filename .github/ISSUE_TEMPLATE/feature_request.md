@@ -1,20 +1,31 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
+about: Propose a focused improvement to the vendor-neutral core package
+title: '[Feature]: '
+labels: 'enhancement'
 assignees: ''
-
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## Problem
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+<!-- Describe the concrete problem or repeated use case. -->
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## Proposed Solution
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+<!-- Describe the public API or behavior you would like. Include a short usage example when useful. -->
+
+## Shared Core Rationale
+
+<!-- Explain why this belongs in a vendor-neutral core package rather than an application or platform adapter. -->
+
+## Alternatives Considered
+
+<!-- Describe existing workarounds or alternative designs. -->
+
+## Compatibility Impact
+
+<!-- Note any API, runtime, configuration, logging, or packaging implications. -->
+
+## Additional Context
+
+<!-- Add related issues, prior implementations, benchmarks, or other useful context. -->
