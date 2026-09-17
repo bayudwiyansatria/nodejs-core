@@ -13,7 +13,7 @@
  * | Directory     | Holds                                                | May import from   |
  * | ------------- | ---------------------------------------------------- | ----------------- |
  * | `index.ts`    | re-exports only                                      | every layer       |
- * | `core/`       | behaviour: `Service`, `Logger`, the config engine    | every layer below |
+ * | `core/`       | behaviour: `Service`, `Logger`, `Retry`, config      | every layer below |
  * | `types/`      | shapes callers receive or supply, incl. capabilities | nothing in `src/` |
  * | `constants/`  | values that never depend on runtime state            | nothing in `src/` |
  * | `exceptions/` | the faults raised                                    | nothing in `src/` |
@@ -52,7 +52,8 @@
 /**
  * Core
  */
-export { configure, LogFields, Logger, resolve, Service } from '@/core'
+export { configure, LogFields, Logger, resolve, Retry, Service } from '@/core'
+export type { RetryOptions } from '@/core'
 
 /**
  * Core — implementations that satisfy a capability without providing it

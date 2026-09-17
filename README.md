@@ -1,159 +1,154 @@
-# Core
+# @bayudwiyansatria/core
 
-[![Main](https://github.com/bayudwiyansatria/nodejs-core/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/bayudwiyansatria/nodejs-core/actions/workflows/main.yml)
-[![codecov](https://codecov.io/gh/bayudwiyansatria/nodejs-core/graph/badge.svg?token=V029T8Yx6X)](https://codecov.io/gh/bayudwiyansatria/nodejs-core)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+[![Build](https://github.com/bayudwiyansatria/nodejs-core/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/bayudwiyansatria/nodejs-core/actions/workflows/main.yml)
+[![Coverage](https://codecov.io/gh/bayudwiyansatria/nodejs-core/graph/badge.svg?token=V029T8Yx6X)](https://codecov.io/gh/bayudwiyansatria/nodejs-core)
 [![License](https://img.shields.io/github/license/bayudwiyansatria/nodejs-core)](LICENSE)
 [![Version](https://img.shields.io/github/package-json/v/bayudwiyansatria/nodejs-core)](package.json)
+[![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 
-A vendor-neutral kernel for Node.js and TypeScript services: capability interfaces, configuration resolution, structured
-logging, security utilities, and a consistent service response contract.
+A vendor-neutral TypeScript foundation for Node.js services. It provides capability contracts, configuration resolution,
+structured logging, bounded retries, security helpers, and consistent service responses without coupling business logic
+to a cloud provider, framework, or runtime.
 
-## Overview
+- **Portable by design:** applications depend on capability interfaces while separate adapters provide implementations.
+- **Zero runtime dependencies:** the published package does not introduce third-party runtime code.
+- **Multiple module formats:** distributed as ESM, CommonJS, UMD, and TypeScript declarations.
+- **Stable service primitives:** shared configuration, logging, response, resilience, and security conventions.
 
-This package is a foundation layer for services that share the same architecture. Its primary responsibilities are
-platform capability contracts, configuration resolution, structured logging, security and general-purpose utilities, and
-an abstract `Service` base that fixes the response shape.
+[API reference](https://bayudwiyansatria.github.io/nodejs-core) · [Developer documentation](docs/README.md) ·
+[Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
 
-It has no runtime dependencies and names no vendor, no runtime, and no HTTP framework. A cache is described by the
-`CacheStore` interface; which cache you actually get is decided by a separate adapter package. Applications import the
-interface, adapters implement it, and business logic written against `CacheStore` moves between platforms unchanged.
+## Contents
 
-Published to the GitHub npm registry as `@bayudwiyansatria/core`, built by Rollup into CommonJS, ESM, UMD, and type
-declaration artifacts under `lib/`.
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Core concepts](#core-concepts)
+- [Public API](#public-api)
+- [Architecture](#architecture)
+- [Development](#development)
+- [Community and support](#community-and-support)
 
-## Included in This Package
+## Installation
 
-| Category      | Exports                                                                                      |
-| ------------- | -------------------------------------------------------------------------------------------- |
-| Contracts     | `Service`, `APIResponse`                                                                     |
-| Capabilities  | `Capability` plus ten interfaces over it, and four `Noop*` implementations                   |
-| Configuration | `configure`, `resolve`, `systemDefaults`, `SystemConfiguration`, `Overrides`, settings types |
-| Observability | `Logger`, `LogFields`, `LogContext`, `LogLevel`, `LoggingSettings`                           |
-| Security      | `redact`, `timingSafeEqual`                                                                  |
-| Errors        | `MissingCapabilityError`, `ConfigurationError`                                               |
-| Utilities     | `Json`, `List`, `Signature`, `Text`, `Time`                                                  |
-
-Tooling and project baseline:
-
-- TypeScript setup with `@/*` path aliases (`tsconfig*.json`)
-- Rollup build producing four artifacts in `lib/`
-- Jest with coverage output to `dist/coverage`, reported to Codecov
-- ESLint and Prettier, including the layering and vendor-neutrality rules
-- TypeDoc API reference to `dist/docs`, with undocumented exports treated as build failures
-- HonKit developer book to `dist/book`, with a custom dark theme
-- Docker docs site with an nginx landing page
-- Community standards files (Contributing, Code of Conduct, Security, Support)
-- Changelog, release notes, and changes-log structure
-
-## Install
-
-### Requirements
-
-- Node.js 22 and npm for development and for the workflows documented in this repository
-- A GitHub personal access token (classic) with `read:packages` permission for GitHub Packages
-
-Authenticate to GitHub Packages. Use your GitHub username when prompted and the personal access token as the password:
+The package is published to GitHub Packages. Authenticate with a GitHub personal access token that has the
+`read:packages` permission:
 
 ```bash
 npm login --scope=@bayudwiyansatria --auth-type=legacy --registry=https://npm.pkg.github.com
 ```
 
-Then map this package scope to GitHub Packages in the consuming project's `.npmrc`:
+Configure the package scope in the consuming project's `.npmrc`:
 
 ```text
 @bayudwiyansatria:registry=https://npm.pkg.github.com
 ```
 
-Never commit a personal access token to the repository. CI should provide its token through a secret such as
-`NPM_AUTH_TOKEN`.
-
-Install the package:
+Then install the package:
 
 ```bash
 npm install @bayudwiyansatria/core
 ```
 
-## Quick Start
+> [!IMPORTANT] Never commit a personal access token. Supply registry credentials through your local npm configuration or
+> a CI secret such as `NPM_AUTH_TOKEN`.
+
+## Quick start
+
+Configure the shared settings once during application startup, then create a structured logger:
 
 ```ts
 import { configure, Logger, systemDefaults } from '@bayudwiyansatria/core'
 
-// Once, at startup, before anything reads a setting.
 configure(systemDefaults)
 
-const log = Logger.fromEnv({ SERVICE_NAME: 'article-api' }, { component: 'ArticleService' })
-log.info('service.started')
+const logger = Logger.fromEnv(
+  {
+    LOG_LEVEL: 'info',
+    SERVICE_NAME: 'article-api'
+  },
+  { component: 'ArticleService' }
+)
+
+logger.info('service.started')
 ```
 
-Applications that use a platform adapter merge that adapter's defaults with `systemDefaults` before calling
-`configure()`.
+Applications using a platform adapter can combine its defaults with the system defaults:
 
-## Usage
+```ts
+import { configure, systemDefaults } from '@bayudwiyansatria/core'
+import { platformDefaults } from '<adapter-package>'
+
+configure({ ...systemDefaults, ...platformDefaults }, overrides)
+```
+
+## Core concepts
 
 ### Configuration
 
-Call `configure()` once at startup, then read settings anywhere with `resolve()`.
+`configure()` registers defaults and optional overrides. `resolve()` reads the resulting settings from anywhere in the
+application:
 
 ```ts
 import { configure, resolve, systemDefaults } from '@bayudwiyansatria/core'
 import type { LoggingSettings } from '@bayudwiyansatria/core'
 
-configure(systemDefaults, { logging: { service: 'article-api' } })
+configure(systemDefaults, {
+  logging: { service: 'article-api' }
+})
 
 const logging = resolve<LoggingSettings>('logging')
-// { level: 'info', service: 'article-api' }
 ```
 
-Overrides merge per field, not per module. The example above changes `service` and keeps the default `level`. A field
-set to `undefined` is ignored rather than treated as a blank.
+Overrides merge by field, so partial overrides retain unspecified defaults. Fields set to `undefined` are ignored. Call
+`configure()` before resolving settings, and avoid calling `resolve()` at module scope in adapters. See the
+[configuration guide](docs/reference/configuration.md) for initialization order, merge behavior, and troubleshooting.
 
-`resolve()` throws a `ConfigurationError` when a module is in neither the defaults nor the overrides. In practice that
-means either `configure()` has not run yet, or two copies of this package are loaded. See
-[Notes for Adapters](#notes-for-adapters).
+### Structured logging
 
-### Logging
-
-`Logger` writes structured JSON lines, flat — a field is indexed as `id`, not `data.id`. `fromEnv` reads `LOG_LEVEL`,
-`SERVICE_NAME` and `LOG_FIELDS` off the environment object you hand it, falling back to the configured surface. Levels
-are `debug`, `info`, `warn`, `error`.
+`Logger` writes flat JSON lines suitable for log aggregation and indexing:
 
 ```ts
-import { Logger } from '@bayudwiyansatria/core'
+const logger = Logger.fromEnv(process.env, { component: 'ArticleService' })
 
-const log = Logger.fromEnv({ SERVICE_NAME: 'article-api' }, { component: 'ArticleService' })
+logger.info('article.created', { id: 42 })
+logger.error('external_api.failed', { status: 502 }, 'Upstream service returned an error')
 
-log.info('article.created', { id: 42 })
-log.error('external_api.error', { status: 502 }, 'Upstream returned 502')
-
-const scoped = log.child({ requestId: 'req-123' }) // inherits context, adds its own
+const requestLogger = logger.child({ requestId: 'req-123' })
 ```
 
-Three arguments, and each answers a different question:
-
-| Argument  | For                                      | Example                 |
-| --------- | ---------------------------------------- | ----------------------- |
-| `event`   | machines — filtering, grouping, counting | `article.created`       |
-| `data`    | the facts that vary per call             | `{ id: 42 }`            |
-| `message` | people — the column a log viewer shows   | `Upstream returned 502` |
-
-`message` is optional and falls back to the event name, so the column is never blank.
-
-**Which ambient fields reach the line** is a deployment's decision, via `LOG_FIELDS` or `logging.fields`:
+Each log call separates the stable event name, structured data, and human-readable message. Ambient context fields can
+be selected with `LOG_FIELDS`:
 
 ```bash
-LOG_FIELDS="requestId,method,path"   # only these
-LOG_FIELDS="*"                       # everything (the default)
-LOG_FIELDS=""                        # level, event and message alone
+LOG_FIELDS="requestId,method,path" # selected fields
+LOG_FIELDS="*"                     # all fields (default)
+LOG_FIELDS=""                      # no ambient context fields
 ```
 
-It governs _context_ — what `fromEnv` and `child` stamp on every line. What a call site passes to one log call is always
-emitted. The kernel narrows nothing by itself; an adapter that knows what its runtime already records supplies its own
-list.
+### Capability contracts
 
-### Services
+Applications program against small, runtime-neutral interfaces. Adapter packages bind those interfaces to concrete
+infrastructure.
 
-`Service` is an abstract base giving you `ok()` and `fail()`, so every service returns the same `APIResponse` shape.
+| Interface               | Responsibility              |
+| ----------------------- | --------------------------- |
+| `CacheStore`            | Key/value caching           |
+| `CoordinationStore`     | Locks and coordination      |
+| `DataStore`             | Document or record storage  |
+| `InferenceEngine`       | Model inference             |
+| `MessageQueue`          | Message publishing/handling |
+| `ObjectStore`           | Object and blob storage     |
+| `RateLimiter`           | Request throttling          |
+| `SqlConnectionProvider` | Relational connections      |
+| `TelemetrySink`         | Metrics and request facts   |
+| `VectorIndex`           | Vector search               |
+
+No-op implementations are available for cache, messaging, rate limiting, and telemetry. They are useful in tests and in
+deployments where those capabilities are intentionally disabled.
+
+### Consistent service responses
+
+Extend `Service` to return the same `APIResponse` shape across service methods:
 
 ```ts
 import { Service } from '@bayudwiyansatria/core'
@@ -163,192 +158,152 @@ export class ProfileService extends Service {
   public async get(id: string): Promise<APIResponse> {
     const profile = await this.repository.find(id)
 
-    return profile ? this.ok('profile found', profile) : this.fail('no profile with that id')
+    return profile ? this.ok('Profile found', profile) : this.fail('Profile not found')
   }
 }
 ```
 
-Use `fail()` for outcomes the caller asked for and did not get, like a missing row. Throw for faults the caller cannot
-act on, so they surface as a 500 instead of a well-formed `false`.
+Use `fail()` for expected negative outcomes that callers can act on. Throw errors for unexpected faults so application
+error handling can surface them appropriately.
 
-### Capabilities
+### Bounded retries
 
-Ten interfaces describe what an application needs from its platform. Each extends `Capability` and is generic over the
-runtime type an adapter binds to.
+`Retry.run()` retries transient failures with exponential backoff. The default budget comes from `delivery.retries` and
+`delivery.retryBackoffMs`:
 
-| Interface               | Covers                    |
-| ----------------------- | ------------------------- |
-| `CacheStore`            | key/value cache           |
-| `CoordinationStore`     | locks and coordination    |
-| `DataStore`             | document/record storage   |
-| `InferenceEngine`       | model inference           |
-| `MessageQueue`          | publish and consume       |
-| `ObjectStore`           | blob storage              |
-| `RateLimiter`           | request throttling        |
-| `SqlConnectionProvider` | relational connections    |
-| `TelemetrySink`         | metrics and request facts |
-| `VectorIndex`           | vector search             |
+```ts
+import { Retry } from '@bayudwiyansatria/core'
 
-`NoopCacheStore`, `NoopMessageQueue`, `NoopRateLimiter`, and `NoopTelemetrySink` satisfy their interface without doing
-anything, which is useful in tests and in deployments where the capability is not wired up.
+const rates = await Retry.run(() => client.rates(), {
+  logger,
+  event: 'rates.retry'
+})
+```
 
-### Utilities
+The built-in policy retries rate limits, selected server errors, and network failures. Abort and timeout errors are not
+retried. Only retry operations that are safe to repeat; callers can provide `isRetryable` for domain-specific rules.
 
-- `Json.parse<T>(text)` to parse untrusted JSON without throwing
-- `List.chunk(values, size)` to split a list into runs of at most `size`, for a batch with a ceiling downstream
-- `Signature.sign(secret, scope, value)` and `Signature.verify(...)` for stateless tokens over HMAC-SHA-256
-- `Text.truncate`, `Text.trim`, `Text.isBlank`
-- `Time.now`, `Time.nowIso`, `Time.since`
-- `timingSafeEqual(a, b)` for constant-time string comparison
-- `redact(data)` to scrub credential-named fields out of anything bound for a log stream
+### Security and utilities
 
-## Project Structure
+The package includes focused helpers for common service concerns:
+
+```ts
+import { Json, List, redact, Signature, Text, Time, timingSafeEqual } from '@bayudwiyansatria/core'
+```
+
+| Export            | Purpose                                            |
+| ----------------- | -------------------------------------------------- |
+| `redact`          | Remove credential-like fields before logging data  |
+| `timingSafeEqual` | Compare strings without leaking timing information |
+| `Signature`       | Create and verify HMAC-SHA-256 signatures          |
+| `Json`            | Parse untrusted JSON without throwing              |
+| `List`            | Split lists into bounded chunks                    |
+| `Text`            | Trim, truncate, and test blank strings             |
+| `Time`            | Read timestamps and calculate elapsed time         |
+
+## Public API
+
+Everything exported from [`src/index.ts`](src/index.ts) is public API.
+
+| Category      | Main exports                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| Services      | `Service`, `APIResponse`                                                                     |
+| Capabilities  | `Capability`, ten capability interfaces, four no-op implementations                          |
+| Configuration | `configure`, `resolve`, `systemDefaults`, `SystemConfiguration`, `Overrides`, settings types |
+| Observability | `Logger`, `LogFields`, `LogContext`, `LogLevel`, `LoggingSettings`                           |
+| Resilience    | `Retry`, `RetryOptions`                                                                      |
+| Security      | `redact`, `timingSafeEqual`                                                                  |
+| Errors        | `ConfigurationError`, `MissingCapabilityError`                                               |
+| Utilities     | `Json`, `List`, `Signature`, `Text`, `Time`                                                  |
+
+For signatures and detailed behavior, visit the
+[generated API reference](https://bayudwiyansatria.github.io/nodejs-core).
+
+## Architecture
+
+This package is the innermost layer of a service architecture. It deliberately does not depend on vendor SDKs, web
+frameworks, or platform-specific runtime types.
+
+```text
+Application and business logic
+            |
+            v
+  @bayudwiyansatria/core       capability contracts and shared primitives
+            ^
+            |
+     Adapter packages          vendor and runtime implementations
+```
+
+The source tree reinforces that boundary:
 
 ```text
 src/
-  index.ts              Public API barrel, the entire published surface
-  core/                 Service, Logger, configure, resolve, ConfigurationRegistry
-    noop/               No-op capability implementations
-  types/                Shapes callers receive or supply
-    capabilities/       The capability interfaces and their supporting shapes
-  constants/            systemDefaults
-  exceptions/           MissingCapabilityError, ConfigurationError
-  security/             redact, timingSafeEqual
-  utils/                List, Signature, Text, Time
-test/                   Jest specs (*.spec.ts) mirroring src/
-docs/                   Documentation and release history
-  reference/            Reference guides
-  styles/               Custom CSS for the HonKit book theme
-  book.json             HonKit configuration
-  SUMMARY.md            Book table of contents
-  changes-log/          Per-date change logs
-  release-notes/        Per-version release notes
-docker/                 Docker assets for the docs site
-  nginx/                Nginx config and landing page
-  docs.Dockerfile       Multi-stage build for the docs site
-  docker-compose.docs.yaml
-eslint.config.ts        Layering and vendor-neutrality rules
-rollup.config.ts        Build pipeline for the four lib/ artifacts
-CHANGELOG.md            Top-level changelog
-CONTRIBUTING.md         Contribution workflow
-SECURITY.md             Security policy
-SUPPORT.md              Support channels
+  core/         Configuration, logging, services, retries, and no-op capabilities
+  types/        Public contracts and configuration shapes
+  constants/    Runtime-neutral defaults
+  exceptions/   Public error classes
+  security/     Security-oriented helpers
+  utils/        Pure, vendor-neutral utilities
+  index.ts      Public API barrel
 ```
 
-### Layering
+`types/`, `constants/`, `exceptions/`, `security/`, and `utils/` are leaf layers and cannot import from `core/`. ESLint
+enforces this dependency direction and the vendor-neutral boundary.
 
-`types/`, `constants/`, `exceptions/`, `security/`, and `utils/` are leaf layers: they import nothing else from `src/`.
-Only `core/` and `index.ts` import across layers. Keeping the leaves free of the config engine and the logger is what
-lets them be read, tested, or moved elsewhere on their own.
-
-A `no-restricted-imports` rule in [`eslint.config.ts`](eslint.config.ts) enforces it, so this fails `npm run lint`:
-
-```ts
-// src/utils/Text.ts
-import { resolve } from '@/core'
-```
-
-If a leaf genuinely needs something from `core/`, take it as an argument or move the shared piece down into a leaf.
-
-`security/` is separate from `utils/` on intent rather than size. `timingSafeEqual` exists because the obvious
-alternative is unsafe, and `redact` for the same reason — handing a payload straight to a logger leaks credentials into
-a stream nobody re-reads before it ships. JWT and PKI helpers would go there too.
-
-## Available Scripts
-
-- `npm run build` Build the four `lib/` artifacts via Rollup
-- `npm run dev` Rollup in watch mode
-- `npm test` Run lint and tests
-- `npm run test:run` Run Jest with coverage
-- `npm run lint:run` Run ESLint over `src`
-- `npm run lint:fix` Run ESLint with auto-fix
-- `npm run format` Run Prettier over config, `src`, and `test`
-- `npm run build:docs` Generate the TypeDoc API reference into `dist/docs`
-- `npm run build:docs:book` Build the HonKit developer book into `dist/book`
-- `npm run build:docs:coverage` Produce the coverage report into `dist/coverage`
-- `npm run build:static` Build every static artifact into `dist/` (`index.html`, `docs/`, `book/`, `coverage/`)
-- `npm run build:all` Build the library and the static site
-- `npm run docker:build:docs` Build the docs site image
-- `npm run docker:serve:docs` Serve the docs site with Docker Compose
-
-## Notes for Adapters
-
-If code here looks like it needs a vendor SDK, a runtime's types, or an HTTP framework, it belongs in an adapter package
-instead. An ESLint rule enforces this.
-
-Adapters must treat this package as an external dependency, not bundle it. The configuration registry is module state
-and `MissingCapabilityError` is a class identity, so a second inlined copy breaks both quietly: `configure()` seeds one
-registry while the adapter reads the other, and `instanceof` stops matching. Assert this against your built bundles
-rather than trusting the bundler config.
+Adapter packages must keep `@bayudwiyansatria/core` external rather than bundling it. Configuration uses module state,
+and loading a second embedded copy would create a separate registry and break error class identity.
 
 ## Development
 
-Development and CI use Node.js 22. The generated bundles target ES2020.
+Development and CI use Node.js 22.
 
 ```bash
+git clone https://github.com/bayudwiyansatria/nodejs-core.git
+cd nodejs-core
 npm ci
-npm test           # lint + jest
-npm run build      # four artifacts under lib/
-npm run build:docs
+npm test
+npm run build
 ```
 
-`typedoc.json` sets `treatWarningsAsErrors` and `validation.notDocumented`, so an undocumented export or a broken
-cross-reference fails `npm run build:docs`.
+Common commands:
 
-CI runs on push to `master`
-([Main](https://github.com/bayudwiyansatria/nodejs-core/blob/master/.github/workflows/main.yml)) and on `feature/**` and
-`hotfix/**` branches
-([Features](https://github.com/bayudwiyansatria/nodejs-core/blob/master/.github/workflows/features.yml)). Releases are
-cut manually through the Release Dispatch workflow.
+| Command                   | Purpose                                             |
+| ------------------------- | --------------------------------------------------- |
+| `npm test`                | Run ESLint and Jest with coverage                   |
+| `npm run test:run`        | Run Jest with coverage                              |
+| `npm run lint:run`        | Check source files with ESLint                      |
+| `npm run format`          | Format source, tests, configuration, and Markdown   |
+| `npm run build`           | Build ESM, CommonJS, UMD, and declaration artifacts |
+| `npm run build:docs`      | Generate the TypeDoc API reference                  |
+| `npm run build:docs:book` | Generate the HonKit developer guide                 |
+| `npm run build:static`    | Build documentation, coverage, and the landing page |
+
+Generated `lib/` and `dist/` output is intentionally not committed.
 
 ## Documentation
 
-- [Docs Home](docs/README.md)
-- [Summary](docs/SUMMARY.md)
-- [Configuration Reference](docs/reference/configuration.md) — `configure`, `resolve`, merge semantics, and the ordering
-  constraint
-- [Latest Release Notes](docs/release-notes/1.3.0.md)
-- [Latest Changes Log](docs/changes-log/2026-09-11.md)
-- [API Reference](https://bayudwiyansatria.github.io/nodejs-core) — generated from source
-
-### Docs Site
-
-The docs site combines three artifacts behind an nginx landing page:
-
-- **API Docs** TypeDoc reference at `dist/docs`
-- **Coverage Report** Jest HTML report at `dist/coverage`
-- **Developer Book** HonKit guide at `dist/book`, with dark theme and full-text search
-
-Build them locally:
-
-```bash
-npm run build:static
-```
-
-Or serve the whole site with Docker:
-
-```bash
-npm run docker:serve:docs
-```
-
-Then open `http://localhost` for the landing page, which links to the docs, the coverage report, and the book.
-
-## Contributing and Governance
-
-- [Contributing Guide](CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Security Policy](SECURITY.md)
-- [Support Guide](SUPPORT.md)
+- [Developer documentation](docs/README.md)
+- [Configuration reference](docs/reference/configuration.md)
+- [Latest release notes](docs/release-notes/1.3.0.md)
+- [Latest engineering changes log](docs/changes-log/2026-09-17.md)
+- [Generated API reference](https://bayudwiyansatria.github.io/nodejs-core)
 - [Changelog](CHANGELOG.md)
 
-## Authors
+The static documentation site combines the TypeDoc API reference, HonKit developer guide, and Jest coverage report.
+Build it locally with `npm run build:static` or serve it through Docker with `npm run docker:serve:docs`.
 
-- [Bayu Dwiyan Satria](https://github.com/bayudwiyansatria) - Creator and Maintainer
+## Community and support
 
-## Acknowledgments
+Contributions are welcome. Before opening a pull request, read the [contributing guide](CONTRIBUTING.md) and
+[Code of Conduct](CODE_OF_CONDUCT.md).
 
-Thanks to the open-source community and all contributors for support and inspiration.
+- Use [GitHub Issues](https://github.com/bayudwiyansatria/nodejs-core/issues) for reproducible bugs and focused feature
+  proposals.
+- Follow the [support guide](SUPPORT.md) for usage questions.
+- Report vulnerabilities privately according to the [security policy](SECURITY.md).
+
+This project follows [Semantic Versioning](https://semver.org/).
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+Licensed under the [MIT License](LICENSE).

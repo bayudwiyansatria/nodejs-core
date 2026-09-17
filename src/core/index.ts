@@ -4,7 +4,7 @@
  * The domain layer: what this library does.
  *
  * @remarks
- * Four things live here, and they are the only things in the package that
+ * Five things live here, and they are the only things in the package that
  * *behave* — everything else is a shape, a constant, or a pure helper:
  *
  * - {@link Service} — the base a business service extends, and the `ok()` /
@@ -12,6 +12,7 @@
  * - {@link Logger} — structured, level-classified lines to the runtime's log
  *   stream, and {@link LogFields}, which decides how much of one is ingested.
  * - {@link configure} and {@link resolve} — the configuration engine.
+ * - {@link Retry} — a bounded retry that reads its budget from `delivery`.
  * - [`noop/`](./noop/index.ts) — implementations that satisfy a capability
  *   without providing it.
  *
@@ -59,5 +60,8 @@ export { Logger } from '@/core/Logger'
 export { LogFields } from '@/core/LogFields'
 export { configure } from '@/core/configure'
 export { resolve } from '@/core/resolve'
+export { Retry } from '@/core/Retry'
+
+export type { RetryOptions } from '@/core/RetryOptions'
 
 export { NoopCacheStore, NoopMessageQueue, NoopRateLimiter, NoopTelemetrySink } from '@/core/noop'

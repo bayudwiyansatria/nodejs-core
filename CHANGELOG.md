@@ -10,6 +10,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/), and releases
 
 ## [Unreleased]
 
+Targets 1.4.0. See the [release notes](docs/release-notes/1.4.0.md) and the
+[2026-09-17 changes log](docs/changes-log/2026-09-17.md).
+
+### Added
+
+- **`Retry`** — a bounded retry with exponential backoff. `Retry.run(operation, options)` reads its attempt count and
+  backoff from `delivery.retries` and `delivery.retryBackoffMs`, which `systemDefaults` has registered since 1.1.0 with
+  nothing in the package reading them. Resolved inside each call, never at module scope
+- **`Retry.isRetryable(error)`**, the default judgement. Retries `429`, the `5xx` gateway family and network failures;
+  never an abort or a timeout. It recognises an HTTP failure by shape, an `Error` carrying a numeric `status`, so the
+  kernel still takes no dependency on the client that threw it
+- **`RetryOptions`** — `attempts`, `backoffMs`, `isRetryable`, `logger`, and `event`, the name each re-attempt's `warn`
+  line carries (`'retry'` unless given)
+
 ### Documentation
 
 - Corrected stale support, release-note, and changes-log links before public repository publication
