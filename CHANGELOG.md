@@ -10,7 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/), and releases
 
 ## [Unreleased]
 
-Targets 1.3.1. See the [release notes](docs/release-notes/1.3.1.md) and the
+### Documentation
+
+- The changes logs and release notes no longer name private consuming applications; they are described as applications
+  or consumers instead. Public packages and the platform are still named
+
+## [1.3.1] - 2026-09-17
+
+`Retry` moves in beside the `delivery` settings it reads. See the [release notes](docs/release-notes/1.3.1.md) and the
 [2026-09-17 changes log](docs/changes-log/2026-09-17.md).
 
 ### Added
@@ -196,7 +203,8 @@ whose placeholder source was removed.
 
 See [docs/release-notes/1.0.0.md](docs/release-notes/1.0.0.md) for full release details.
 
-[Unreleased]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.3.0...HEAD
+[Unreleased]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.3.1...HEAD
+[1.3.1]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.2.1...1.3.0
 [1.2.1]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/bayudwiyansatria/nodejs-core/compare/1.1.0...1.2.0
