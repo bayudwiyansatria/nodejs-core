@@ -10,7 +10,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/), and releases
 
 ## [Unreleased]
 
-Targets 1.4.0. See the [release notes](docs/release-notes/1.4.0.md) and the
+Targets 1.3.1. See the [release notes](docs/release-notes/1.3.1.md) and the
 [2026-09-17 changes log](docs/changes-log/2026-09-17.md).
 
 ### Added

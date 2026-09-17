@@ -61,8 +61,8 @@ const sleep = (ms: number): Promise<void> => new Promise(done => setTimeout(done
  * ```
  *
  * @author Bayu Dwiyan Satria
- * @version 1.4.0
- * @since 1.4.0
+ * @version 1.3.1
+ * @since 1.3.1
  */
 export class Retry {
   /**

@@ -8,7 +8,7 @@
 
 ## Release Information
 
-- [1.4.0 — `Retry` joins the settings it reads](release-notes/1.4.0.md)
+- [1.3.1 — `Retry` joins the settings it reads](release-notes/1.3.1.md)
 - [1.3.0 — Two helpers that were already written twice](release-notes/1.3.0.md)
 - [1.2.1 — A flat line, a readable message, and a field list](release-notes/1.2.1.md)
 - [1.2.0 — `event`, not `message`, and a redaction pass](release-notes/1.2.0.md)
