@@ -122,7 +122,7 @@
     "minimatch@3": {
       "brace-expansion": "^1.1.17"
     },
-    "undici": "^7.29.0"
+    "undici": "^7.30.0"
   },
   "allowScripts": {
     "esbuild": false,
