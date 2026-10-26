@@ -74,6 +74,7 @@ ESLint and Prettier configuration live in `eslint.config.ts` and `.prettierrc.js
 - Related declarations and assertions stay together; avoid a blank line after every statement
 - Test setup, actions, and assertions form visible groups
 - Comments explain intent or constraints; avoid repeating the code or test name
+- Use consistent generic service names in comments, examples, and fixtures.
 - TypeScript target and module: ES2020
 - `@/*` maps to `src/*`; there is intentionally no `baseUrl`
 - The build configuration is flexible, while tests use the stricter `tsconfig.test.json`

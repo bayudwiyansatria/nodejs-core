@@ -287,7 +287,7 @@ See the [readability guide](docs/reference/readability.md) for logical spacing, 
 
 - [Developer documentation](docs/README.md)
 - [Configuration reference](docs/reference/configuration.md)
-- [Latest release notes](docs/release-notes/1.3.0.md)
+- [Latest release notes](docs/release-notes/1.3.2.md)
 - [Latest engineering changes log](docs/changes-log/2026-09-17.md)
 - [Generated API reference](https://bayudwiyansatria.github.io/nodejs-core)
 - [Changelog](CHANGELOG.md)

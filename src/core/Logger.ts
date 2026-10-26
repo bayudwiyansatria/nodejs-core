@@ -103,13 +103,10 @@ export class Logger {
    * satisfy it.
    *
    * The service name is read from the environment first and the configuration
-   * surface second. The order is the point: a name in the environment sits
-   * beside the deployment's own name — in `wrangler.json`, two lines below
-   * `"name"` — where a rename that misses it shows up in the same diff. A name
-   * compiled into the bundle from `config/` sits in a different file that a
-   * rename does not touch, which is how a Worker came to spend production
-   * calling itself `cloudflare-boilerplate`. The configuration value remains
-   * the fallback for runtimes with no environment to read.
+   * surface second. Keeping the environment value beside deployment settings
+   * lets a rename update both together, avoiding a stale name compiled into
+   * the bundle. The configuration value remains the fallback for runtimes
+   * with no environment to read.
    *
    * With neither set the line still carries a `service`, reading `unknown`. A
    * missing name is a deployment defect, and an omitted key would make it an

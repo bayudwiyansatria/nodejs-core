@@ -10,6 +10,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/), and releases
 
 ## [Unreleased]
 
+### Documentation
+
+- Standardized service-name examples across source comments, tests, and documentation.
+
+### Security
+
+- Ignored local environment files to reduce accidental credential commits.
+
+## [1.3.2] - 2026-10-26
+
+Development dependency security fixes, readability, and development checks, with no runtime or public API changes. See
+the [release notes](docs/release-notes/1.3.2.md) and the [2026-10-26 changes log](docs/changes-log/2026-10-26.md).
+
 ### Development
 
 - Added formatting checks to `npm test` and extended linting to tests.
@@ -19,9 +32,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/), and releases
 ### Documentation
 
 - Added a local readability guide with code, test, and writing examples.
-- Corrected the developer-book link to the October 4 engineering record.
-- The changes logs and release notes no longer name private consuming applications; they are described as applications
-  or consumers instead. Public packages and the platform are still named
+- Removed the developer-book link to the deleted October 4 engineering record.
+
+### Security
+
+- Updated the development lockfile's `handlebars` from 4.7.9 to 4.7.10 to address critical
+  [CVE-2026-106445](https://github.com/handlebars-lang/handlebars.js/security/advisories/GHSA-p8wg-vrv2-v86f) and
+  [CVE-2026-106446](https://github.com/handlebars-lang/handlebars.js/security/advisories/GHSA-8r5x-fm3f-whwj).
+- Refreshed `undici`, `brace-expansion`, `markdown-it`, and `serialize-javascript` to patched versions. The
+  [release notes](docs/release-notes/1.3.2.md) list the CVEs and resolved versions.
+- Added `js-yaml` overrides at `^4.3.2` for `front-matter` and `@istanbuljs/load-nyc-config`.
+- The October 26 lockfile audit reported zero vulnerabilities. No runtime dependencies were added.
 
 ## [1.3.1] - 2026-09-17
 
@@ -119,8 +140,8 @@ things it was restating. See the [release notes](docs/release-notes/1.2.0.md).
 - **The service name comes from `SERVICE_NAME` in the environment**, ahead of `logging.service` on the configuration
   surface. A name in the environment sits beside the deployment's own name, where a rename that misses it shows up in
   the same diff; a constant compiled in from `config/` sits in a file a rename does not touch, which is how a Worker
-  spent production calling itself `cloudflare-boilerplate`. `LoggingSettings.service` is now optional and
-  `systemDefaults` supplies none, so code reading it reads `string | undefined`
+  spent production logging a stale template name. `LoggingSettings.service` is now optional and `systemDefaults`
+  supplies none, so code reading it reads `string | undefined`
 - **A line with no name available reads `service: "unknown"`** rather than omitting the field, so a forgotten
   `SERVICE_NAME` is a query result rather than an invisible gap
 

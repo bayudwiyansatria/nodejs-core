@@ -102,9 +102,9 @@ describe('Logger', () => {
    * sink, or a stream shared with another service.
    */
   it('stamps the service name from the environment on every line', () => {
-    Logger.fromEnv({ SERVICE_NAME: 'mcp-server' }).info('service.started')
+    Logger.fromEnv({ SERVICE_NAME: 'example-service' }).info('service.started')
 
-    expect(lineFrom('info').service).toBe('mcp-server')
+    expect(lineFrom('info').service).toBe('example-service')
   })
 
   it('falls back to the configured service name with no environment', () => {
@@ -119,15 +119,14 @@ describe('Logger', () => {
    * The environment wins, and the order is the whole point: `SERVICE_NAME` sits
    * beside the deployment's own name, where a rename that misses it is visible
    * in the same diff. A constant compiled in from `config/` is in a file a
-   * rename does not touch — which is how a Worker spent production calling
-   * itself `cloudflare-boilerplate`.
+   * rename does not touch and can retain a stale template name.
    */
   it('prefers the environment over a stale configured name', () => {
-    configure(systemDefaults, { logging: { service: 'cloudflare-boilerplate' } })
+    configure(systemDefaults, { logging: { service: 'template-service' } })
 
-    Logger.fromEnv({ SERVICE_NAME: 'cloud-cost-worker' }).info('tagged')
+    Logger.fromEnv({ SERVICE_NAME: 'example-service' }).info('tagged')
 
-    expect(lineFrom('info').service).toBe('cloud-cost-worker')
+    expect(lineFrom('info').service).toBe('example-service')
   })
 
   /*
@@ -278,14 +277,14 @@ describe('Logger', () => {
    */
   describe('field selection', () => {
     it('emits every context field by default', () => {
-      Logger.fromEnv({ SERVICE_NAME: 'mcp-server' }, { requestId: 'r1', colo: 'SIN' }).info('tagged')
+      Logger.fromEnv({ SERVICE_NAME: 'example-service' }, { requestId: 'r1', colo: 'SIN' }).info('tagged')
 
-      expect(lineFrom('info')).toMatchObject({ service: 'mcp-server', requestId: 'r1', colo: 'SIN' })
+      expect(lineFrom('info')).toMatchObject({ service: 'example-service', requestId: 'r1', colo: 'SIN' })
     })
 
     it('keeps only the declared context fields', () => {
       Logger.fromEnv(
-        { SERVICE_NAME: 'mcp-server', LOG_FIELDS: 'requestId,method' },
+        { SERVICE_NAME: 'example-service', LOG_FIELDS: 'requestId,method' },
         { requestId: 'r1', method: 'POST', colo: 'SIN' }
       ).info('narrowed')
 
@@ -310,7 +309,7 @@ describe('Logger', () => {
      * why it cannot fall through to the surface.
      */
     it('treats an empty declaration as no context at all', () => {
-      Logger.fromEnv({ SERVICE_NAME: 'mcp-server', LOG_FIELDS: '' }, { requestId: 'r1' }).info('bare')
+      Logger.fromEnv({ SERVICE_NAME: 'example-service', LOG_FIELDS: '' }, { requestId: 'r1' }).info('bare')
 
       const line = lineFrom('info')
 
