@@ -6,17 +6,13 @@
  * @since 1.3.0
  */
 /**
- * JSON helpers for untrusted input.
+ * @class
+ *
+ * Parses untrusted JSON without throwing on invalid syntax.
  *
  * @remarks
- * A request body is whatever the client sent. `JSON.parse` answers that with an
- * exception, which pushes a `try`/`catch` into every route that reads a body;
- * these helpers answer with a value instead, so a handler can decide the status
- * code in one line.
- *
- * Pure, vendor-neutral, and previously written identically in two consumers —
- * which is the test this module's own remarks set for belonging here rather than
- * in an application.
+ * Parsing does not validate the result's shape. Callers must check the fields
+ * they need, even when they supply a type argument.
  *
  * @example
  * ```ts
@@ -27,25 +23,17 @@
  * }
  * ```
  *
- * @class
- *
  * @author Bayu Dwiyan Satria
  * @version 1.0.0
  * @since 1.3.0
  */
 export class Json {
   /**
-   * Parses JSON without throwing.
+   * Parses JSON, returning null for empty input, invalid syntax, or a null literal.
    *
-   * @remarks
-   * `null` covers every way the input can fail to be a usable object —
-   * malformed syntax, an empty body, or a bare `null` literal — because none of
-   * them is something a handler can act on differently.
-   *
-   * @typeParam T The expected shape. Unverified: this parses, it does not
-   *   validate. The caller checks the fields it needs on the parsed value.
+   * @typeParam T The expected shape, which is not validated.
    * @param text The raw text to parse.
-   * @returns The parsed value, or `null` when the text is not usable JSON.
+   * @returns The parsed value, including valid primitives, or null.
    */
   public static parse<T = unknown>(text: string): T | null {
     if (!text) {

@@ -1,12 +1,5 @@
 import { ConfigurationError, configure, resolve } from '../../src/index'
 
-/**
- * The contract `resolve` is documented to keep, exercised field by field.
- *
- * These are the semantics every adapter package relies on, so a change that
- * breaks one of them breaks every consumer at once — which is why they are
- * pinned here rather than left to the doc comment.
- */
 describe('resolve', () => {
   /**
    * A two-module surface standing in for the assembled real one: one module the

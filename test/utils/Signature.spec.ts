@@ -1,13 +1,5 @@
 import { Signature } from '../../src/index'
 
-/**
- * Stateless signed tokens over HMAC-SHA-256.
- *
- * The properties worth pinning are the ones a token is *relied on* for: it
- * verifies against the inputs that produced it, and against nothing else. Each
- * negative case below is a distinct way a signature could be forged if the
- * corresponding input were left out of the signed payload.
- */
 describe('Signature', () => {
   const secret = 'shared-secret'
   const scope = 'password-reset'
@@ -53,7 +45,7 @@ describe('Signature', () => {
     await expect(Signature.verify(secret, scope, value, '')).resolves.toBe(false)
   })
 
-  it('rejects a token that is not valid base64url', async () => {
+  it('rejects a token that is not valid hexadecimal', async () => {
     await expect(Signature.verify(secret, scope, value, 'not a token')).resolves.toBe(false)
   })
 

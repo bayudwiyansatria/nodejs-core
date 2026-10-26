@@ -10,8 +10,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/), and releases
 
 ## [Unreleased]
 
+### Development
+
+- Added formatting checks to `npm test` and extended linting to tests.
+- Enforced blank lines around logical statement groups and between class members.
+- Shortened repetitive API and test commentary while preserving behavior and public contracts.
+
 ### Documentation
 
+- Added a local readability guide with code, test, and writing examples.
+- Corrected the developer-book link to the October 4 engineering record.
 - The changes logs and release notes no longer name private consuming applications; they are described as applications
   or consumers instead. Public packages and the platform are still named
 

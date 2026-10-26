@@ -5,18 +5,13 @@ import { Text } from '@/utils/Text'
 import { Time } from '@/utils/Time'
 
 import type { LogContext } from '@/types/logging/LogContext'
-
 import type { LoggingSettings } from '@/types/LoggingSettings'
 import type { LogLevel } from '@/types/logging/LogLevel'
 
 /**
- * Relative weight of each level, used to apply the threshold.
+ * Relative weight of each severity level.
  *
- * @remarks
- * `LogLevel` is declared in [`types/`](../types/index.ts) and imported as a type
- * only. Keeping the runtime value here — rather than an enum shared with the
- * configuration layer — is what stops `Logger → resolve → Defaults → Logger`
- * from becoming a real import cycle.
+ * The type lives in types/ so configuration can use it without importing Logger.
  */
 const WEIGHT: Record<LogLevel, number> = {
   debug: 10,
@@ -26,111 +21,35 @@ const WEIGHT: Record<LogLevel, number> = {
 }
 
 /**
- * What `service` reads when nothing names the deployment.
- *
- * @remarks
- * A marker rather than an omitted field, and the distinction is the whole
- * reason it exists. Every line is supposed to say which service wrote it, so
- * that it still means something once it has left the console it was written to.
- * A deployment that forgets to set `SERVICE_NAME` breaks that guarantee, and an
- * absent key breaks it *invisibly* — the lines look ordinary, the Worker looks
- * healthy, and nothing surfaces until someone needs to tell two services apart
- * in one stream and cannot.
- *
- * This turns that into something a query finds: `service = unknown` returns
- * every misconfigured deployment in the account.
+ * Fallback service name, making missing deployment configuration searchable.
  */
 const UNNAMED = 'unknown'
 
 /**
- * Keys the line owns, which nothing else may occupy.
- *
- * @remarks
- * Context and payload are both merged onto the line, and either could carry a
- * key named `level` or `message` — a forwarded upstream record especially,
- * where those names are exactly what a log line calls its own fields. Letting
- * one through would leave a line whose severity disagrees with the stream it
- * was written to, which is worse than losing the field: a collector indexes the
- * value it sees, so an `error` payload could arrive filed as `info` and never
- * surface in a severity filter.
- *
- * These three are written first and re-asserted against every merged key.
+ * Fields that context and payload must not overwrite.
  */
 const RESERVED = new Set(['level', 'event', 'message'])
 
 /**
  * @class
  *
- * Structured, level-classified logging — and nothing else.
- *
- * Each line is one JSON object emitted through the matching `console.*` method,
- * so the runtime's log collector records the native level and keeps the fields
- * searchable. Nothing here aggregates — that is {@link TelemetrySink}, a
- * separate capability, because a sink samples at volume and is the wrong place
- * for lines that have to be read back verbatim.
+ * Writes structured JSON through the console method matching each severity level.
  *
  * @remarks
- * ## An event name *and* a sentence
+ * Use a stable, dotted event name such as `article.created`. Put variable values
+ * in the payload and an optional human-readable sentence in the third argument.
+ * When omitted, the message defaults to the event name.
  *
- * The first argument is an **event name** — a stable, lowercase, dotted
- * identifier such as `notification.sent` or `external_api.error` — emitted
- * under the `event` key. A collector that indexes JSON fields turns that key
- * into a column, so `event = notification.failed` becomes a filter rather than
- * a substring search, and the count of one event over time becomes a series. A
- * prose sentence can be neither: `'Failed to send notification for user 7'` is
- * a different string on every line it is written.
+ * Context and payload fields are flattened onto each line. The field allow-list
+ * filters context only; explicit payload fields remain available. Neither may
+ * overwrite `level`, `event`, or `message`.
  *
- * That is why the third argument exists rather than replacing the first. A
- * `message` is written for whoever is *reading* the stream, and it is the only
- * thing most log viewers show by default. Omit it and the event name stands in,
- * so the column is never empty; supply it and the line says something in
- * English without anyone opening it:
+ * `LOG_LEVEL`, `SERVICE_NAME`, and `LOG_FIELDS` override the registered logging
+ * settings. With no service name, lines use `unknown`. A child logger adds context
+ * while keeping its parent's threshold and field selection.
  *
- * ```ts
- * log.warn('external_api.error', { provider, status }, `Telegram rejected the send (${status})`)
- * ```
- *
- * Anything that varies belongs in the payload, where it stays structured and
- * searchable on its own — never interpolated into the event name.
- *
- * ## One flat object
- *
- * Context and payload are flattened onto the line, not nested under a wrapper,
- * so a field is indexed as `status` rather than `data.status`.
- *
- * Context passes through an allow-list first; see `LogFields`. Payload never
- * does — it was named at the call site for this one call, and dropping it there
- * would discard the answer somebody logged the line to get.
- *
- * ## Which deployment wrote it
- *
- * `service` names the deployment, from `SERVICE_NAME` in the environment or,
- * failing that, `logging.service` on the configuration surface. It is context,
- * so it reaches the line only while the allow-list admits it — which the kernel
- * default does.
- *
- * Some runtimes already record it: Cloudflare stamps the script name on every
- * log record before it is stored, so a Worker that never leaves that console
- * gains nothing from a second copy and can drop the field. A deployment whose
- * lines *travel* — exported to a file, shipped through Logpush, read on a
- * runtime with no such column — should keep it, because a record that only
- * makes sense inside one vendor's console is not a record.
- *
- * That is the trade the allow-list exists to let a deployment make, rather than
- * this class making it for every consumer. The value comes from the environment
- * rather than a constant compiled into the bundle, so whichever way it is
- * decided the name cannot drift from the deployment it describes.
- *
- * `service` answers *which service*; a line that needs to say which part of it
- * ran names a `component` in the context.
- *
- * The threshold comes from the surface registered by {@link configure}, and
- * `LOG_LEVEL` in the environment overrides it per deployment, so staging can run
- * at `debug` without a code change.
- *
- * Retention is the runtime's business, not this class's — it writes lines and
- * stops there. Whether they are kept, and for how long, is a deployment setting
- * wherever the process runs.
+ * Payloads pass through redaction, then top-level Error values expand to message
+ * and stack. The runtime controls log collection and retention.
  *
  * @example
  * ```ts

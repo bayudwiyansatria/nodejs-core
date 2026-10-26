@@ -5,6 +5,7 @@
 ## Reference
 
 - [Configuration](reference/configuration.md) — `configure`, `resolve`, merge semantics, and the ordering constraint
+- [Readability](reference/readability.md) — spacing, comments, test structure, and review checks
 
 ## Release Information
 
@@ -17,6 +18,8 @@
 
 ## Changes Log
 
+- [2026-10-26 — Readability and formatting checks](changes-log/2026-10-26.md)
+- [2026-10-04 — Agent context](changes-log/2026-10-04.md) — local instructions and verification scope
 - [2026-09-17 — `Retry` moves in after all](changes-log/2026-09-17.md)
 - [2026-09-11 — One utility survivor and a publication-ready repository](changes-log/2026-09-11.md)
 - [2026-09-05 — One `chunk`, from two that disagreed](changes-log/2026-09-05.md)

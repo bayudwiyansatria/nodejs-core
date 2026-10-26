@@ -1,13 +1,5 @@
 import { Time } from '../../src/index'
 
-/**
- * Clock access, wrapped so the framework has one place to read time from.
- *
- * The interesting case is `since`: it measures request duration, and a clock
- * that steps backwards — NTP correction, a suspended isolate — must not yield a
- * negative one, because a negative duration poisons every aggregate computed
- * over it downstream.
- */
 describe('Time.since', () => {
   afterEach(() => {
     jest.restoreAllMocks()

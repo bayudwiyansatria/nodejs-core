@@ -31,22 +31,29 @@ For usage questions, follow [SUPPORT.md](SUPPORT.md). Report vulnerabilities pri
 Useful commands:
 
 ```bash
-npm test                 # lint and Jest tests
+npm test                 # formatting, lint, and Jest tests
 npm run build            # CommonJS, ESM, UMD, and declarations
 npm run build:docs       # TypeDoc API reference
 npm run build:docs:book  # HonKit developer documentation
-npm run format           # format source and test files
+npm run format           # format source, tests, docs, and configuration
+npm run format:check     # check formatting without changing files
+npm run lint:fix         # fix supported lint issues in source and tests
 ```
 
 ## Code and Documentation Style
 
 - Use TypeScript for implementation code.
 - Use two-space indentation, single quotes, no semicolons, and a 120-character print width.
+- Separate declarations, validation, work, and returns with useful blank lines.
+- Group test setup, actions, and assertions so each case reads in order.
+- Write one idea per paragraph and explain constraints without repeating the code.
 - Keep `types/`, `constants/`, `exceptions/`, `security/`, and `utils/` independent of `core/`.
 - Keep runtime, vendor, and framework-specific behavior in adapter packages.
 - Add JSDoc to every public export; TypeDoc treats missing documentation and invalid links as errors.
 - Put Jest specs in `test/` and use the `*.spec.ts` suffix.
 - Update the README and reference documentation when public behavior changes.
+
+The [readability guide](docs/reference/readability.md) includes examples and the checks used during review.
 
 ## Branch and Commit Guidelines
 

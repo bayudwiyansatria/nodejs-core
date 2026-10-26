@@ -4,12 +4,7 @@ import type { DeliverySettings } from '@/types/DeliverySettings'
 import type { RetryOptions } from '@/core/RetryOptions'
 
 /**
- * HTTP statuses worth trying again.
- *
- * @remarks
- * Rate limiting and the gateway family. Any other 4xx is the far end saying the
- * request itself was wrong, and repeating it unchanged asks the same question
- * again — so `400` and `404` are absent on purpose.
+ * HTTP statuses eligible for retry by the default policy.
  */
 const TRANSIENT_STATUS: ReadonlySet<number> = new Set([429, 500, 502, 503, 504])
 
@@ -24,36 +19,16 @@ const sleep = (ms: number): Promise<void> => new Promise(done => setTimeout(done
 /**
  * @class
  *
- * A bounded retry with exponential backoff.
+ * Retries an operation with a bounded attempt count and exponential backoff.
  *
  * @remarks
- * Bounded is the load-bearing word. A scheduled job runs against a wall-clock
- * budget, and an unbounded retry turns one unreachable dependency into an
- * invocation that never ends.
+ * Reads `delivery.retries` and `delivery.retryBackoffMs` inside each call, after
+ * application configuration. Callers can override either setting in RetryOptions.
  *
- * ## Why it is in the kernel
+ * The default policy identifies HTTP failures by an Error's numeric `status`
+ * field. Supply `isRetryable` for application-specific failures.
  *
- * The kernel has declared the retry *policy* since 1.1.0: `delivery.retries` and
- * `delivery.retryBackoffMs` are in {@link systemDefaults}. Until this class,
- * nothing in the package read them, so every consumer that wanted to honour them
- * had to write the loop that does. This is that loop, beside the settings it
- * reads.
- *
- * It reads them **inside** each call rather than at module scope. Resolving at
- * module scope runs before the application's {@link configure} and throws
- * {@link ConfigurationError} on startup.
- *
- * ## What it does not know
- *
- * Nothing here names a transport. The default judgement recognises an HTTP
- * failure by shape — an `Error` carrying a numeric `status` — rather than by
- * class, so this package takes no dependency on the client that threw it. A
- * caller with its own non-retryable failures, such as a validation error,
- * supplies `isRetryable` and defers to {@link Retry.isRetryable} for the rest.
- *
- * Retry only what is safe to repeat. Replaying an operation that writes needs
- * that write to be idempotent, which is a promise this class cannot make for
- * the caller.
+ * Operations must be safe to repeat. Callers are responsible for idempotent writes.
  *
  * @example
  * ```ts

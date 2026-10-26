@@ -161,16 +161,7 @@ export default tseslint.config(
    * Ignored paths — the former `.eslintignore`.
    */
   {
-    ignores: [
-      'node_modules/',
-      'dist/',
-      'lib/',
-      'coverage/',
-      'eslint.config.ts',
-      'rollup.config.ts',
-      '**/*.test.ts',
-      '**/*.spec.ts'
-    ]
+    ignores: ['node_modules/', 'dist/', 'lib/', 'coverage/', 'eslint.config.ts', 'rollup.config.ts']
   },
 
   /**
@@ -203,6 +194,14 @@ export default tseslint.config(
     rules: {
       eqeqeq: 'off',
       curly: 'error',
+      'padding-line-between-statements': [
+        'error',
+        { blankLine: 'always', prev: '*', next: ['return', 'throw', 'if', 'for', 'while', 'switch', 'try'] },
+        { blankLine: 'always', prev: 'block-like', next: '*' },
+        { blankLine: 'always', prev: ['const', 'let'], next: '*' },
+        { blankLine: 'any', prev: ['const', 'let'], next: ['const', 'let'] }
+      ],
+      'lines-between-class-members': ['error', 'always'],
       'multiline-comment-style': 'warn',
       'no-case-declarations': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
@@ -220,13 +219,20 @@ export default tseslint.config(
         }
       ],
       /*
-       * Formatting is Prettier's job, run through `npm run format`. Reporting it
-       * as a lint error too means every reformat shows up twice.
+       * Prettier checks syntax layout through `npm run format:check`. The padding
+       * rules above check logical groups that Prettier preserves but cannot add.
        */
       'prettier/prettier': 'off',
       'documentation/kind-tag-without-argument': 'error',
       'documentation/no-redundant-tag': 'error',
       'documentation/one-declaration-per-file': 'error'
+    }
+  },
+
+  {
+    files: ['test/**/*.ts'],
+    languageOptions: {
+      globals: globals.jest
     }
   },
 

@@ -1,13 +1,5 @@
 import { Json } from '../../src/index'
 
-/**
- * Parsing a body the caller did not write.
- *
- * Every interesting case is a way the input fails to be a usable object, since
- * that is the whole reason the helper exists: `JSON.parse` answers those with an
- * exception, and a handler that has to `try`/`catch` around every body read is
- * the thing being avoided.
- */
 describe('Json.parse', () => {
   it('parses an object', () => {
     expect(Json.parse<{ symbol: string }>('{"symbol":"BBCA"}')).toEqual({ symbol: 'BBCA' })

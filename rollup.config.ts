@@ -120,7 +120,7 @@ const typesOptions = {
  */
 const eslintPluginOption = eslint({
   include: [
-    'src/**/*.js', 
+    'src/**/*.js',
     'src/**/*.ts'
   ]
 })
@@ -187,14 +187,14 @@ const rollupTask = [
   {
     input: `src/index.ts`,
     output: [
-      commonJsOptions, 
-      esmOptions, 
+      commonJsOptions,
+      esmOptions,
       umdOptions
     ],
     plugins: [
-      resolveOption, 
-      eslintPluginOption, 
-      typescriptPluginOption, 
+      resolveOption,
+      eslintPluginOption,
+      typescriptPluginOption,
       terserPluginOption
     ],
     onwarn: printWarning
@@ -205,7 +205,7 @@ const rollupTask = [
       typesOptions
     ],
     plugins: [
-      typescriptPluginOption, 
+      typescriptPluginOption,
       definitionPluginOption
     ],
     onwarn: printWarning

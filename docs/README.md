@@ -1,7 +1,7 @@
 # Documentation
 
-This is the developer book for `@bayudwiyansatria/core`. The API reference is generated separately by TypeDoc from the
-public surface in [`src/index.ts`](../src/index.ts); everything a generator cannot infer lives here.
+This developer book covers configuration, contribution standards, and release history for `@bayudwiyansatria/core`.
+TypeDoc generates the API reference separately from the public exports in [`src/index.ts`](../src/index.ts).
 
 Each adapter package documents its own implementations of these capabilities.
 
@@ -10,14 +10,15 @@ Each adapter package documents its own implementations of these capabilities.
 | Doc                                              | Covers                                                               |
 | ------------------------------------------------ | -------------------------------------------------------------------- |
 | [configuration.md](./reference/configuration.md) | `configure`, `resolve`, merge semantics, and the ordering constraint |
+| [readability.md](./reference/readability.md)     | Logical spacing, comments, test structure, and formatting checks     |
 
 ## [`release-notes/`](./release-notes/)
 
-Per-version release notes — what shipped in each release.
+Release notes describe what shipped in each version.
 
 ## [`changes-log/`](./changes-log/)
 
-Dated engineering change log (`YYYY-MM-DD.md`) — a more granular, chronological record of what changed and why.
+Dated engineering records (`YYYY-MM-DD.md`) explain individual changes and their verification.
 
 ---
 

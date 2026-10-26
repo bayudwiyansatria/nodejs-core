@@ -1,12 +1,5 @@
 import { configure, Logger, systemDefaults } from '../../src/index'
 
-/**
- * Structured logging, and the threshold that decides what reaches the stream.
- *
- * This is also the one place the kernel's own code reads through `resolve`, so
- * these cases double as proof that the `configure` inversion actually feeds the
- * framework and not just direct callers.
- */
 describe('Logger', () => {
   /**
    * Captures one line per `console` method without letting it reach the runner.

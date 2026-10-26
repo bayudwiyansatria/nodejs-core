@@ -1,12 +1,5 @@
 import { Text } from '../../src/index'
 
-/**
- * Pure string helpers the framework itself uses.
- *
- * `truncate` caps a telemetry sampling key, and the rest normalise input, so the
- * cases that matter are the boundary and the nullish ones — everything a caller
- * would otherwise have to guard before calling.
- */
 describe('Text.truncate', () => {
   it('leaves a string shorter than the cap untouched', () => {
     expect(Text.truncate('abc', 10)).toBe('abc')

@@ -1,12 +1,5 @@
 import { MissingCapabilityError } from '../../src/index'
 
-/**
- * The vendor-neutral base every adapter's "not provisioned" error extends.
- *
- * Its value is entirely in being catchable from outside the package that threw:
- * an adapter throws its own subclass, and application code catches this one. The
- * cases below pin the parts that contract depends on.
- */
 describe('MissingCapabilityError', () => {
   it('is an Error', () => {
     expect(new MissingCapabilityError('cache')).toBeInstanceOf(Error)

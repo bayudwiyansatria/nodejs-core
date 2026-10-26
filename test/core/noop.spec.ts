@@ -1,13 +1,5 @@
 import { NoopCacheStore, NoopMessageQueue, NoopRateLimiter, NoopTelemetrySink } from '../../src/index'
 
-/**
- * Implementations that satisfy a capability without providing it.
- *
- * Their whole purpose is to let a deployment that never provisioned the backing
- * resource keep running, so what is pinned here is the degradation each
- * interface documents — every one of these must degrade rather than throw, and
- * must answer `isAvailable` honestly so a caller that *does* care can branch.
- */
 describe('NoopCacheStore', () => {
   const cache = new NoopCacheStore()
 

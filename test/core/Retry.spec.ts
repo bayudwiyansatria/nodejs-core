@@ -10,14 +10,6 @@ import type { Logger } from '../../src/index'
  */
 const httpFailure = (status: number): Error => Object.assign(new Error(`status ${status}`), { status })
 
-/**
- * Retry is the only thing between a flaky dependency and a job that never ends,
- * so what matters is the bound: the attempt count is respected exactly, and the
- * failures that must never be retried never are.
- *
- * Backoff is overridden to zero wherever the delay is not the subject — these
- * specs are about decisions, and a real 250 ms backoff adds time, not confidence.
- */
 describe('Retry.run', () => {
   beforeEach(() => {
     configure({ ...systemDefaults })
@@ -83,6 +75,7 @@ describe('Retry.run', () => {
 
   it('doubles the backoff and logs each re-attempt under the named event', async () => {
     jest.useFakeTimers()
+
     try {
       const warn = jest.fn()
       const logger = { warn } as unknown as Logger
@@ -107,15 +100,15 @@ describe('Retry.run', () => {
 })
 
 describe('Retry.isRetryable', () => {
-  it.each([429, 500, 502, 503, 504])('retries a %i, which is the far end asking for a moment', status => {
+  it.each([429, 500, 502, 503, 504])('retries transient HTTP status %i', status => {
     expect(Retry.isRetryable(httpFailure(status))).toBe(true)
   })
 
-  it.each([400, 401, 403, 404, 422])('does not retry a %i, which repeats the same question', status => {
+  it.each([400, 401, 403, 404, 422])('does not retry non-transient HTTP status %i', status => {
     expect(Retry.isRetryable(httpFailure(status))).toBe(false)
   })
 
-  it.each(['AbortError', 'TimeoutError'])('does not retry an %s, whose budget is already spent', name => {
+  it.each(['AbortError', 'TimeoutError'])('does not retry %s', name => {
     const aborted = new Error('The operation was aborted')
 
     aborted.name = name
@@ -123,11 +116,11 @@ describe('Retry.isRetryable', () => {
     expect(Retry.isRetryable(aborted)).toBe(false)
   })
 
-  it('retries a bare network failure, since DNS and connection resets are worth a second look', () => {
+  it('retries a network failure without an HTTP status', () => {
     expect(Retry.isRetryable(new TypeError('fetch failed'))).toBe(true)
   })
 
-  it('retries a thrown value that is not an Error, which carries nothing to judge', () => {
+  it('retries a thrown value that is not an Error', () => {
     expect(Retry.isRetryable('socket hang up')).toBe(true)
   })
 

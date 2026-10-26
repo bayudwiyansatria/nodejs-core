@@ -269,16 +269,19 @@ Common commands:
 
 | Command                   | Purpose                                             |
 | ------------------------- | --------------------------------------------------- |
-| `npm test`                | Run ESLint and Jest with coverage                   |
+| `npm test`                | Check formatting, lint, and run Jest with coverage  |
 | `npm run test:run`        | Run Jest with coverage                              |
-| `npm run lint:run`        | Check source files with ESLint                      |
+| `npm run lint:run`        | Check source and tests with ESLint                  |
 | `npm run format`          | Format source, tests, configuration, and Markdown   |
+| `npm run format:check`    | Check formatting without changing files             |
 | `npm run build`           | Build ESM, CommonJS, UMD, and declaration artifacts |
 | `npm run build:docs`      | Generate the TypeDoc API reference                  |
 | `npm run build:docs:book` | Generate the HonKit developer guide                 |
 | `npm run build:static`    | Build documentation, coverage, and the landing page |
 
 Generated `lib/` and `dist/` output is intentionally not committed.
+
+See the [readability guide](docs/reference/readability.md) for logical spacing, comments, and test structure.
 
 ## Documentation
 

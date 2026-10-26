@@ -1,14 +1,5 @@
 import { timingSafeEqual } from '../../src/index'
 
-/**
- * Comparison used on secrets.
- *
- * The timing property itself is not assertable in a unit test — a benchmark
- * would be flaky and prove little. What is assertable, and what a careless
- * "optimisation" would break, is that the function never short-circuits its way
- * to a wrong *answer*: the equality result must stay exactly right for the edge
- * cases an early return would get wrong.
- */
 describe('timingSafeEqual', () => {
   it('accepts identical strings', () => {
     expect(timingSafeEqual('s3cr3t', 's3cr3t')).toBe(true)

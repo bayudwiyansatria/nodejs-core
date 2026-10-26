@@ -3,44 +3,30 @@ import { resolve } from '@/core/resolve'
 import type { LoggingSettings } from '@/types/LoggingSettings'
 
 /**
- * The declaration that admits every context field.
- *
- * @remarks
- * The kernel's own default, and the reason it is this rather than a curated
- * list: a package that decided for its consumers which fields matter would be
- * deciding on behalf of runtimes it knows nothing about. Narrowing is an
- * adapter's job — it is the layer that knows what the platform already records
- * and therefore what a line need not repeat.
+ * Declaration that admits every context field.
  */
 const EVERY = '*'
 
 /**
  * @class
  *
- * Which context fields reach the log line.
+ * Selects which ambient context fields reach a log line.
  *
  * @remarks
- * A log line carries two kinds of field, and only one of them is negotiable.
- * *Context* is ambient — the request id, the method, the path, the address —
- * repeated on every line for the span of a request, and stamped by middleware
- * rather than chosen at the call site. *Payload* is what a caller passed to one
- * log call because that call needed it. This governs the first and never the
- * second: a field someone typed out deliberately is not noise to be filtered.
+ * Reads the comma-separated `LOG_FIELDS` declaration before the configured
+ * `logging.fields` fallback. A star admits everything; an empty declaration
+ * admits nothing. An unset declaration uses the configured fields, or all fields
+ * when no fallback is registered.
  *
- * The declaration is a comma-separated list, read from `LOG_FIELDS` in the
- * environment first and the configuration surface second — the same order as
- * `LOG_LEVEL`, and for the same reason. A deployment can narrow what it ingests
- * without a rebuild.
- *
- * `*` admits everything and is the kernel default. An empty declaration admits
- * nothing, which is not the same as leaving it unset: `LOG_FIELDS=""` is a
- * deployment saying the level, the event, and the message are the whole line.
+ * This selection applies to context only. Payload fields passed to an individual
+ * log call are always retained.
  *
  * @example
  * ```ts
  * const fields = LogFields.fromEnv({ LOG_FIELDS: 'requestId,method,path' })
+ *
  * fields.permits('requestId') // true
- * fields.permits('colo')      // false
+ * fields.permits('colo') // false
  * ```
  *
  * @author Bayu Dwiyan Satria

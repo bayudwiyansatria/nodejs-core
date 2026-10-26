@@ -3,10 +3,11 @@ node_modules/
 dist/
 lib/
 coverage/
+package-lock.json
 
 # User-specific files
+.github/CODEOWNERS
 .prettierignore
 tsconfig.base.json
-**/*.yml
 rollup.config.ts
-eslint.config.ts
+**/*.yml

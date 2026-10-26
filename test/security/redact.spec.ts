@@ -1,13 +1,5 @@
 import { redact } from '../../src/index'
 
-/**
- * The last line of defence between a payload and a log stream.
- *
- * The cases below are grouped by the question each answers: what counts as a
- * secret, how far the walk goes, and what must survive untouched — that last
- * group being the one that keeps redaction from quietly destroying the fields
- * an operator came for.
- */
 describe('redact', () => {
   it('masks a field whose name is a credential', () => {
     expect(redact({ password: 'hunter2' })).toEqual({ password: '[redacted]' })
@@ -130,6 +122,7 @@ describe('redact', () => {
 
   it('terminates on a cyclic structure', () => {
     const cyclic: Record<string, unknown> = { name: 'loop' }
+
     cyclic.self = cyclic
 
     expect(() => redact(cyclic)).not.toThrow()
